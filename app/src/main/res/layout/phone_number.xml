@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.NestedScrollView
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@android:color/white"
+    android:id="@+id/bottom_sheet"
+    app:layout_behavior="android.support.design.widget.BottomSheetBehavior"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="60dp">
+
+            <ImageView
+                android:id="@+id/clear"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:srcCompat="@drawable/ic_clear_grey_500_24dp"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="@dimen/activity_vertical_margin"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@+id/clear"
+                android:layout_marginLeft="@dimen/activity_vertical_margin"
+                android:layout_centerVertical="true"
+                android:textSize="16sp"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:text="Enter Your Mobile no. to get OTP"/>
+
+
+        </RelativeLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/divider"
+            android:alpha="0.5"/>
+
+        <EditText
+            android:id="@+id/mobile_number_xy"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginRight="@dimen/activity_vertical_margin"
+            android:layout_marginLeft="@dimen/activity_vertical_margin"
+            android:gravity="center|left"
+            android:textSize="16sp"
+            android:paddingLeft="@dimen/activity_vertical_margin"
+            android:layout_marginTop="16dp"
+            android:paddingRight="@dimen/activity_vertical_margin"
+            android:hint="10 digit mobile no."
+            android:inputType="phone"
+            android:textColor="@color/green_color"
+            android:background="@drawable/rect_green"/>
+
+        <TextView
+            android:id="@+id/validate"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:text="Validate"
+            android:gravity="center"
+            android:background="@color/green_color"
+            android:textColor="@android:color/white"
+            android:layout_marginRight="@dimen/activity_vertical_margin"
+            android:layout_marginLeft="@dimen/activity_vertical_margin"
+            android:layout_marginTop="32dp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:visibility="invisible"/>
+
+
+    </LinearLayout>
+</android.support.v4.widget.NestedScrollView>
