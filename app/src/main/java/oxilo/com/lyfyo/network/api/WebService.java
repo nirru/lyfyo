@@ -19,15 +19,16 @@ public interface WebService {
             @Field("recentAdd") String recentAdd,
             @Field("service") String service,
             @Field("offer") String offer,
-            @Field("gender") String gender,
+            @Field("gender") int gender,
             @Field("popular") String popular,
+            @Field("location") String location,
             @Field("page") String page);
 
     @FormUrlEncoded
     @POST("index.php/APII/Service")
     io.reactivex.Observable<Response<ResponseBody>> findService(
             @Field("serviceName") String serviceName,
-            @Field("page") String page);
+            @Field("page") int page);
 
     @FormUrlEncoded
     @POST("index.php/APII/Location")

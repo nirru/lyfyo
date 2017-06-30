@@ -20,9 +20,8 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
 import oxilo.com.lyfyo.R;
-import oxilo.com.lyfyo.modal.ServiceModal;
+import oxilo.com.lyfyo.ui.modal.ServiceModal;
 import oxilo.com.lyfyo.ui.activity.DetailActivity;
-import oxilo.com.lyfyo.ui.activity.MainActivity;
 import oxilo.com.lyfyo.ui.adapter.ServicesPagerAdapter;
 import oxilo.com.lyfyo.ui.view.MyViewPager;
 

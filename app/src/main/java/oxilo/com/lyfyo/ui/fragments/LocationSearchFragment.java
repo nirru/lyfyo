@@ -23,7 +23,6 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -63,7 +62,7 @@ import oxilo.com.lyfyo.GeoSearchModel;
 import oxilo.com.lyfyo.LyfoPrefs;
 import oxilo.com.lyfyo.PermissionUtils;
 import oxilo.com.lyfyo.R;
-import oxilo.com.lyfyo.modal.LocationModal;
+import oxilo.com.lyfyo.ui.modal.LocationModal;
 import oxilo.com.lyfyo.network.api.ServiceFactory;
 import oxilo.com.lyfyo.network.api.WebService;
 import oxilo.com.lyfyo.ui.EndlessRecyclerOnScrollListener;
@@ -317,6 +316,8 @@ public class LocationSearchFragment extends Fragment implements GoogleApiClient.
                 } else {
                     linear1.setVisibility(View.GONE);
                     recyleview.setVisibility(View.VISIBLE);
+                    locationListAdapter.clearItem();
+                    locationListAdapter.notifyDataSetChanged();
                     searchLyfoLocation(s.toString(), 1);
                 }
 
@@ -350,6 +351,7 @@ public class LocationSearchFragment extends Fragment implements GoogleApiClient.
         locationListAdapter.setOnItemClickListener(new LocationListAdapter.MyClickListener() {
             @Override
             public void onItemClick(int position, View v) {
+                if (locationModals.size()>0)
                 select.selectedLocation(locationModals.get(position).getLName());
                 ((AppCompatActivity) getActivity()).getSupportFragmentManager().popBackStack();
             }

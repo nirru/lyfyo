@@ -14,7 +14,7 @@ import android.view.ViewGroup;
 import java.util.ArrayList;
 import java.util.List;
 
-import oxilo.com.lyfyo.modal.ServiceModal;
+import oxilo.com.lyfyo.ui.modal.ServiceModal;
 
 /**
  * Created by sonal on 7/2/2015.

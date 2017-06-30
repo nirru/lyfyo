@@ -1,0 +1,81 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="oxilo.com.lyfyo.ui.fragments.ServiceFragments">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp">
+
+        <ImageView
+            android:id="@+id/go_back"
+            android:layout_width="60dp"
+            android:layout_height="match_parent"
+            android:layout_centerVertical="true"
+            android:scaleType="centerInside"
+            app:srcCompat="@drawable/ic_keyboard_backspace_black_24dp"/>
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Select Services"
+            android:textSize="16sp"
+            android:layout_centerInParent="true"/>
+
+        <TextView
+            android:id="@+id/done"
+            android:layout_width="70dp"
+            android:layout_height="match_parent"
+            android:text="Done"
+            android:textSize="14sp"
+            android:gravity="center"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"/>
+    </RelativeLayout>
+
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#bdbdbd"
+        android:alpha="0.5"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_margin="@dimen/activity_vertical_margin">
+
+        <EditText
+            android:id="@+id/serach_services"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:textSize="14sp"
+            android:hint="search for Services"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:gravity="center|left"
+            android:background="@drawable/rect_border"/>
+
+        <ImageView
+            android:id="@+id/clear"
+            android:layout_width="30dp"
+            android:layout_height="match_parent"
+            android:scaleType="centerInside"
+            android:layout_alignParentRight="true"
+            android:src="@drawable/ic_highlight_off_grey_500_18dp"/>
+
+    </RelativeLayout>
+
+
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recyleview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+    </android.support.v7.widget.RecyclerView>
+</LinearLayout>

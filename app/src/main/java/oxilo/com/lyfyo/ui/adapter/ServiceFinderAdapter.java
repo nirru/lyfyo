@@ -1,8 +1,8 @@
 package oxilo.com.lyfyo.ui.adapter;
 
 import android.content.Context;
+import android.support.v7.widget.AppCompatCheckBox;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,13 +14,14 @@ import android.widget.TextView;
 import java.util.List;
 
 import oxilo.com.lyfyo.R;
-import oxilo.com.lyfyo.ui.modal.LocationModal;
+import oxilo.com.lyfyo.ui.modal.Service;
+import oxilo.com.lyfyo.ui.modal.ServiceModal;
 
 
 /**
  * Created by ericbasendra on 02/12/15.
  */
-public class LocationListAdapter<T> extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
+public class ServiceFinderAdapter<T> extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
     private final int VIEW_ITEM = 1;
     private final int VIEW_PROG = 0;
     private Context mContext;
@@ -28,7 +29,10 @@ public class LocationListAdapter<T> extends RecyclerView.Adapter<RecyclerView.Vi
     private static MyClickListener myClickListener;
     private int inflated_row;
 
-    public LocationListAdapter(int inflated_row, List<T> productLists, Context mContext) {
+    public static AppCompatCheckBox lastChecked = null;
+    public static int lastCheckedPos = 0;
+
+    public ServiceFinderAdapter(int inflated_row, List<T> productLists, Context mContext) {
         this.mContext = mContext;
         this.dataSet = productLists;
         this.inflated_row = inflated_row;
@@ -146,9 +150,12 @@ public class LocationListAdapter<T> extends RecyclerView.Adapter<RecyclerView.Vi
 
     @Override
     public void onBindViewHolder(final RecyclerView.ViewHolder holder, int position) {
+
         if(holder instanceof EventViewHolder){
             T dataItem = dataSet.get(position);
-       ((EventViewHolder) holder).l1.setText(((LocationModal)dataItem).getLName());
+            ((EventViewHolder) holder).ll1.setText(((Service)dataItem).getSEName());
+            ((EventViewHolder) holder).appCompatCheckBox.setChecked(((Service)dataItem).isSelected());
+            ((EventViewHolder) holder).appCompatCheckBox.setTag(dataItem);
         }else{
             ((ProgressViewHolder)holder).progressBar.setIndeterminate(true);
         }
@@ -162,15 +169,6 @@ public class LocationListAdapter<T> extends RecyclerView.Adapter<RecyclerView.Vi
             return 0;
     }
 
-    @Override
-    public void onViewRecycled(RecyclerView.ViewHolder holder) {
-        super.onViewRecycled(holder);
-        Log.e("NAME is==","" + holder.getAdapterPosition());
-    }
-
-
-
-
     private void setFadeAnimation(View view) {
         ScaleAnimation anim = new ScaleAnimation(0.0f, 1.0f, 0.0f, 1.0f, Animation.RESTART, 0.5f, Animation.RESTART, 0.5f);
         anim.setDuration(1000);
@@ -181,12 +179,13 @@ public class LocationListAdapter<T> extends RecyclerView.Adapter<RecyclerView.Vi
     // Complex data items may need more than one view per item, and
     // you provide access to all the views for a data item in a view holder
     public static class EventViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
-
-        protected TextView l1;
+        protected TextView ll1;
+        protected AppCompatCheckBox appCompatCheckBox;
         public EventViewHolder(View v) {
             super(v);
-            l1 = (TextView) v.findViewById(R.id.l1);
-            v.setOnClickListener(this);
+            ll1 = (TextView) v.findViewById(R.id.lqr);
+            appCompatCheckBox = (AppCompatCheckBox) v.findViewById(R.id.checkbox);
+            appCompatCheckBox.setOnClickListener(this);
         }
 
         @Override
