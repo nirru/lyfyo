@@ -22,6 +22,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
@@ -69,6 +70,7 @@ import oxilo.com.lyfyo.PermissionUtils;
 import oxilo.com.lyfyo.R;
 import oxilo.com.lyfyo.network.api.ServiceFactory;
 import oxilo.com.lyfyo.network.api.WebService;
+import oxilo.com.lyfyo.ui.EndlessRecyclerOnScrollListener;
 import oxilo.com.lyfyo.ui.StggeredEndlessRecyclerOnScrollListener;
 import oxilo.com.lyfyo.ui.activity.DetailActivity;
 import oxilo.com.lyfyo.ui.adapter.FilterListAdapter;
@@ -85,11 +87,10 @@ import static android.Manifest.permission.ACCESS_FINE_LOCATION;
  * Activities that contain this fragment must implement the
  * {@link OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link HomeFragment#newInstance} factory method to
+ * Use the {@link FilterResultFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class HomeFragment extends Fragment implements FilterFragment.Filter,LocationSearchFragment.Select, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
-        LocationListener, ActivityCompat.OnRequestPermissionsResultCallback {
+public class FilterResultFragment extends Fragment implements FilterFragment.Filter,LocationSearchFragment.Select{
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -131,53 +132,7 @@ public class HomeFragment extends Fragment implements FilterFragment.Filter,Loca
 
     private OnFragmentInteractionListener mListener;
 
-    /**
-     * Request code for location permission request.
-     *
-     * @see #onRequestPermissionsResult(int, String[], int[])
-     */
-    public static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
 
-    /**
-     * Flag indicating whether a requested permission has been denied after returning in
-     * {@link #onRequestPermissionsResult(int, String[], int[])}.
-     */
-    private boolean mPermissionDenied = false;
-
-    /**
-     * The desired interval for location updates. Inexact. Updates may be more or less frequent.
-     */
-    public static final long UPDATE_INTERVAL_IN_MILLISECONDS = 10000;
-
-    /**
-     * The fastest rate for active location updates. Exact. Updates will never be more frequent
-     * than this value.
-     */
-    public static final long FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS =
-            UPDATE_INTERVAL_IN_MILLISECONDS / 2;
-
-    /**
-     * Provides the entry point to Google Play services.
-     */
-    protected GoogleApiClient mGoogleApiClient;
-
-    /**
-     * Represents a geographical location.
-     */
-    protected Location mCurrentLocation;
-    /**
-     * Stores parameters for requests to the FusedLocationProviderApi.
-     */
-    protected LocationRequest mLocationRequest;
-
-    // Request code to use when launching the resolution activity
-    private static final int REQUEST_RESOLVE_ERROR = 1001;
-    // Unique tag for the error dialog fragment
-    private static final String DIALOG_ERROR = "dialog_error";
-    // Bool to track whether the app is already resolving an error
-    private boolean mResolvingError = false;
-    public final static int PLAY_SERVICES_RESOLUTION_REQUEST = 1000;
-    public static final String TAG = "TAG==";
     private String offer;
     private String rating;
     private String popular;
@@ -191,7 +146,7 @@ public class HomeFragment extends Fragment implements FilterFragment.Filter,Loca
     private boolean isViewNeedUpdate=false;
 
 
-    public HomeFragment() {
+    public FilterResultFragment() {
         // Required empty public constructor
     }
 
@@ -222,8 +177,8 @@ public class HomeFragment extends Fragment implements FilterFragment.Filter,Loca
      * @return A new instance of fragment HomeFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static HomeFragment newInstance(String param1, String param2) {
-        HomeFragment fragment = new HomeFragment();
+    public static FilterResultFragment newInstance(String param1, String param2) {
+        FilterResultFragment fragment = new FilterResultFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -238,44 +193,8 @@ public class HomeFragment extends Fragment implements FilterFragment.Filter,Loca
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
-
-        if (checkPlayServices()) {
-            if (!PermissionUtils.isLocationEnabled(getActivity())) {
-                ApplicationController.getInstance().showSettingsAlert(getActivity());
-                return;
-            }
-        }
     }
 
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        if (filterdatamList==null)
-            filterdatamList = new ArrayList<>();
-        outState.putParcelableArrayList("list", filterdatamList);
-        outState.putBoolean("update", isViewNeedUpdate);
-    }
-
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
-        if (savedInstanceState != null) {
-            //probably orientation change
-            filterdatamList = (ArrayList<FilterDatum>) savedInstanceState.getSerializable("list");
-//            isViewNeedUpdate = (Boolean)savedInstanceState.getBoolean("update");
-        } else {
-            if (filterdatamList != null) {
-                //returning from backstack, data is fine, do nothing
-                int size = filterdatamList.size();
-                if (isViewNeedUpdate)
-                  updateView();
-            } else {
-                //newly created, compute data
-//                myData = computeData();
-            }
-        }
-    }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
@@ -313,60 +232,17 @@ public class HomeFragment extends Fragment implements FilterFragment.Filter,Loca
         // TODO: inflate a fragment view
         View rootView = inflater.inflate(R.layout.fragment_home, container, false);
         unbinder = ButterKnife.bind(this, rootView);
-
+        LyfoPrefs lyfoPrefs = new LyfoPrefs();
+        lyfoPrefs.getLyfoPrefs(getActivity());
+        sublocality.setText(lyfoPrefs.getCity(getActivity()));
+        adminArea.setText(lyfoPrefs.getAdminArea(getActivity()));
+        updateView();
+        showProgress(true);
+        applyFilter(1);
         return rootView;
     }
 
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        if (isLocationNeedToUpdate)
-            resumeService();
-//        if (isViewNeedUpdate)
-//            updateView();
-        LyfoPrefs lyfoPrefs = new LyfoPrefs();
-        lyfoPrefs.getLyfoPrefs(getActivity());
-        if (lyfoPrefs.getCity(getActivity())!=null)
-            sublocality.setText(lyfoPrefs.getCity(getActivity()));
-        if (lyfoPrefs.getAdminArea(getActivity())!=null)
-            adminArea.setText(lyfoPrefs.getAdminArea(getActivity()));
-
-        sallonListAdapter.setOnItemClickListener(new SallonListAdapter.MyClickListener() {
-            @Override
-            public void onItemClick(int position, View v) {
-                Intent i = new Intent(getActivity(), DetailActivity.class);
-                startActivity(i);
-            }
-        });
-
-        if (filterListAdapter!=null){
-            filterListAdapter.setOnItemClickListener(new FilterListAdapter.MyClickListener() {
-                @Override
-                public void onItemClick(int position, View v) {
-
-                }
-            });
-        }
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
-            mGoogleApiClient.stopAutoManage(getActivity());
-            mGoogleApiClient.disconnect();
-        }
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
-            mGoogleApiClient.stopAutoManage(getActivity());
-            mGoogleApiClient.disconnect();
-        }
-    }
 
     @Override
     public void onDestroyView() {
@@ -543,16 +419,36 @@ public class HomeFragment extends Fragment implements FilterFragment.Filter,Loca
     private void updateView(){
         constraintRl.setVisibility(View.GONE);
         searchRecyleList.setVisibility(View.VISIBLE);
-        StaggeredGridLayoutManager llm = new StaggeredGridLayoutManager(2,
-                StaggeredGridLayoutManager.VERTICAL);
+        GridLayoutManager llm = new GridLayoutManager(getActivity(),2);
+        llm.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+            @Override
+            public int getSpanSize(int position) {
+                switch(filterListAdapter.getItemViewType(position)){
+                    case FilterListAdapter.VIEW_ITEM:
+                        return 1;
+                    case FilterListAdapter.VIEW_PROG:
+                        return 2; //number of columns of the grid
+                    default:
+                        return -1;
+                }
+            }
+        });
+
         searchRecyleList.setLayoutManager(llm);
+
         if (filterdatamList==null)
         filterdatamList = new ArrayList<>();
         filterListAdapter = new FilterListAdapter(R.layout.filter_row,filterdatamList,getActivity());
         searchRecyleList.setAdapter(filterListAdapter);
-        searchRecyleList.addOnScrollListener(new StggeredEndlessRecyclerOnScrollListener(llm) {
+        searchRecyleList.addOnScrollListener(new EndlessRecyclerOnScrollListener(llm) {
             @Override
             public void onLoadMore(int current_page) {
+                searchRecyleList.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        filterListAdapter.addItem(null);
+                    }
+                });
                 applyFilter(current_page);
             }
         });
@@ -585,6 +481,9 @@ public class HomeFragment extends Fragment implements FilterFragment.Filter,Loca
                                 ObjectMapper mapper = new ObjectMapper();
                                 mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
                                 filterdatamList = mapper.readValue(mapping.getString("FilterData"), new TypeReference<List<FilterDatum>>(){});
+                                if (filterListAdapter.dataSet.size()>0){
+                                   filterListAdapter.removeItem(filterListAdapter.dataSet.size()-1);
+                                }
                                 for (FilterDatum filter : filterdatamList) {
                                     filterListAdapter.addItem(filter);
                                 }
@@ -654,230 +553,4 @@ public class HomeFragment extends Fragment implements FilterFragment.Filter,Loca
         }
 
     }
-
-
-    //    /**
-//     * Enables the My Location layer if the fine location permission has been granted.
-//     */
-    private void enableMyLocation() {
-        if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) {
-            // Permission to access the location is missing.
-            requestPermissions(new String[]{ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST_CODE);
-        } else if (mGoogleApiClient != null) {
-            // Access to the location has been granted to the app.
-            startLocationUpdates();
-        }
-    }
-
-    /**
-     * Requests location updates from the FusedLocationApi.
-     */
-    protected void startLocationUpdates() {
-        // The final argument to {@code requestLocationUpdates()} is a LocationListener
-        // (http://developer.android.com/reference/com/google/android/gms/location/LocationListener.html).
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                // TODO: Consider calling
-                requestPermissions(new String[]{ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST_CODE);
-                return;
-            } else {
-                LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
-            }
-        } else {
-            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
-        }
-    }
-
-    protected void stopLocationUpdates() {
-        // It is a good practice to remove location requests when the activity is in a paused or
-        // stopped state. Doing so helps battery performance and is especially
-        // recommended in applications that request frequent location updates.
-
-        // The final argument to {@code requestLocationUpdates()} is a LocationListener
-        // (http://developer.android.com/reference/com/google/android/gms/location/LocationListener.html).
-        try {
-            LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-    }
-
-
-    protected void createLocationRequest() {
-        mLocationRequest = new LocationRequest();
-
-        // Sets the desired interval for active location updates. This interval is
-        // inexact. You may not receive updates at all if no location sources are available, or
-        // you may receive them slower than requested. You may also receive updates faster than
-        // requested if other applications are requesting location at a faster interval.
-        mLocationRequest.setInterval(UPDATE_INTERVAL_IN_MILLISECONDS);
-
-        // Sets the fastest rate for active location updates. This interval is exact, and your
-        // application will never receive updates faster than this value.
-        mLocationRequest.setFastestInterval(FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS);
-
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-    }
-
-    /* Creates a dialog for an error message */
-    private void showErrorDialog(int errorCode) {
-        // Create a fragment for the error dialog
-        ErrorDialogFragment dialogFragment = new ErrorDialogFragment();
-        // Pass the error that should be displayed
-        Bundle args = new Bundle();
-        args.putInt(DIALOG_ERROR, errorCode);
-        dialogFragment.setArguments(args);
-        dialogFragment.show(((AppCompatActivity) getActivity()).getSupportFragmentManager(), "errordialog");
-    }
-
-    /* Called from ErrorDialogFragment when the dialog is dismissed. */
-    public void onDialogDismissed() {
-        mResolvingError = false;
-    }
-
-    @Override
-    public void onLocationChanged(Location location) {
-        if (location != null) {
-            stopLocationUpdates();
-            String city = GeoSearchModel.getCityInfo(location.getLatitude(), location.getLongitude(), getActivity());
-            String adminArea = GeoSearchModel.getAdminArea(location.getLatitude(), location.getLongitude(), getActivity());
-            LyfoPrefs lyfo = new LyfoPrefs();
-            lyfo.getEditor(getActivity());
-            lyfo.saveCity(city, getActivity());
-            lyfo.saveAdminArea(adminArea, getActivity());
-            lyfo.saveLat((float) location.getLatitude(), getActivity());
-            lyfo.saveLng((float) location.getLongitude(), getActivity());
-
-            this.adminArea.setText(adminArea);
-            this.sublocality.setText(city);
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @android.support.annotation.NonNull String[] permissions, @android.support.annotation.NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode != LOCATION_PERMISSION_REQUEST_CODE)
-            return;
-        if (PermissionUtils.isPermissionGranted(permissions, grantResults,
-                Manifest.permission.ACCESS_FINE_LOCATION)) {
-            // Enable the my location layer if the permission has been granted.
-            enableMyLocation();
-        } else {
-            // Display the missing permission error dialog when the fragments resume.
-            mPermissionDenied = true;
-        }
-    }
-
-    @Override
-    public void onConnected(@Nullable Bundle bundle) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                // TODO: Consider calling
-                ActivityCompat.requestPermissions(getActivity(), new String[]{ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST_CODE);
-                return;
-            } else {
-                mCurrentLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-                startLocationUpdates();
-            }
-        } else {
-            mCurrentLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-            startLocationUpdates();
-        }
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {
-        if (i == CAUSE_SERVICE_DISCONNECTED) {
-            Toast.makeText(getActivity().getApplicationContext(), "Disconnected. Please re-connect.", Toast.LENGTH_SHORT).show();
-        } else if (i == CAUSE_NETWORK_LOST) {
-            Toast.makeText(getActivity().getApplicationContext(), "Network lost. Please re-connect.", Toast.LENGTH_SHORT).show();
-        }
-        mGoogleApiClient.connect();
-    }
-
-    @Override
-    public void onConnectionFailed(@android.support.annotation.NonNull ConnectionResult result) {
-        if (mResolvingError) {
-            // Already attempting to resolve an error.
-            return;
-        } else if (result.hasResolution()) {
-            try {
-                mResolvingError = true;
-                result.startResolutionForResult(getActivity(), REQUEST_RESOLVE_ERROR);
-            } catch (IntentSender.SendIntentException e) {
-                // There was an error with the resolution intent. Try again.
-                mGoogleApiClient.connect();
-            }
-        } else {
-            // Show dialog using GoogleApiAvailability.getErrorDialog()
-            showErrorDialog(result.getErrorCode());
-            mResolvingError = true;
-        }
-    }
-
-
-    public static class ErrorDialogFragment extends DialogFragment {
-        public ErrorDialogFragment() {
-        }
-
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            // Get the error code and retrieve the appropriate dialog
-            int errorCode = this.getArguments().getInt(DIALOG_ERROR);
-            return GoogleApiAvailability.getInstance().getErrorDialog(
-                    this.getActivity(), errorCode, REQUEST_RESOLVE_ERROR);
-        }
-
-        @Override
-        public void onDismiss(DialogInterface dialog) {
-            dialog.dismiss();
-        }
-    }
-
-    /**
-     * Method to verify google play services on the device
-     */
-    protected boolean checkPlayServices() {
-        int resultCode = GooglePlayServicesUtil
-                .isGooglePlayServicesAvailable(getActivity());
-        if (resultCode != ConnectionResult.SUCCESS) {
-            if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
-                GooglePlayServicesUtil.getErrorDialog(resultCode, getActivity(),
-                        PLAY_SERVICES_RESOLUTION_REQUEST).show();
-            } else {
-                Toast.makeText(getActivity(),
-                        "This device is not supported.", Toast.LENGTH_LONG)
-                        .show();
-                ((AppCompatActivity) getActivity()).finish();
-            }
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * Creating google api client object
-     */
-    public synchronized void buildGoogleApiClient() {
-        mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
-                .enableAutoManage(getActivity(), 0 /* clientId */, this)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(LocationServices.API)
-                .build();
-
-        createLocationRequest();
-    }
-
-    protected void resumeService() {
-        if (checkPlayServices()) {
-            if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
-                mGoogleApiClient.stopAutoManage(getActivity());
-                mGoogleApiClient.disconnect();
-            }
-            buildGoogleApiClient();
-        }
-    }
-
 }

@@ -12,7 +12,7 @@ import retrofit2.http.POST;
  */
 public interface WebService {
     @FormUrlEncoded
-    @POST("index.php/APII/SalonList")
+    @POST("index.php/APII/FilterData")
     io.reactivex.Observable<Response<ResponseBody>> filter(
             @Field("shortByCost") String shortByCost,
             @Field("rating") String rating,
@@ -22,7 +22,9 @@ public interface WebService {
             @Field("gender") int gender,
             @Field("popular") String popular,
             @Field("location") String location,
-            @Field("page") String page);
+            @Field("latitude") double latitude,
+            @Field("longitude") double longitude,
+            @Field("page") int page);
 
     @FormUrlEncoded
     @POST("index.php/APII/Service")

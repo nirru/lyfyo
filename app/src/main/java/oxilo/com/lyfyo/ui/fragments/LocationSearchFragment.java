@@ -351,9 +351,12 @@ public class LocationSearchFragment extends Fragment implements GoogleApiClient.
         locationListAdapter.setOnItemClickListener(new LocationListAdapter.MyClickListener() {
             @Override
             public void onItemClick(int position, View v) {
-                if (locationModals.size()>0)
-                select.selectedLocation(locationModals.get(position).getLName());
-                ((AppCompatActivity) getActivity()).getSupportFragmentManager().popBackStack();
+                if (locationListAdapter.dataSet.size()>0){
+                    LocationModal locationModal = (LocationModal) locationListAdapter.dataSet.get(position);
+                    select.selectedLocation(locationModal.getLName(),locationModal.getCity());
+                    ((AppCompatActivity) getActivity()).getSupportFragmentManager().popBackStack();
+                }
+
             }
         });
 
@@ -428,7 +431,7 @@ public class LocationSearchFragment extends Fragment implements GoogleApiClient.
     /* Creates a dialog for an error message */
     private void showErrorDialog(int errorCode) {
         // Create a fragment for the error dialog
-        LoginActivity.ErrorDialogFragment dialogFragment = new LoginActivity.ErrorDialogFragment();
+        ErrorDialogFragment dialogFragment = new ErrorDialogFragment();
         // Pass the error that should be displayed
         Bundle args = new Bundle();
         args.putInt(DIALOG_ERROR, errorCode);
@@ -445,9 +448,11 @@ public class LocationSearchFragment extends Fragment implements GoogleApiClient.
     public void onLocationChanged(Location location) {
         if (location != null) {
             String city = GeoSearchModel.getCityInfo(location.getLatitude(), location.getLongitude(), getActivity());
+            String adminArea = GeoSearchModel.getAdminArea(location.getLatitude(), location.getLongitude(), getActivity());
             LyfoPrefs lyfo = new LyfoPrefs();
             lyfo.getEditor(getActivity());
             lyfo.saveCity(city, getActivity());
+            lyfo.saveAdminArea(adminArea,getActivity());
             lyfo.saveLat((float) location.getLatitude(), getActivity());
             lyfo.saveLng((float) location.getLongitude(), getActivity());
             stopLocationUpdates();
@@ -531,7 +536,7 @@ public class LocationSearchFragment extends Fragment implements GoogleApiClient.
 
         @Override
         public void onDismiss(DialogInterface dialog) {
-            ((LoginActivity) getActivity()).onDialogDismissed();
+          dialog.dismiss();
         }
     }
 
@@ -631,7 +636,7 @@ public class LocationSearchFragment extends Fragment implements GoogleApiClient.
     }
 
     interface Select {
-        public void selectedLocation(String location);
+        public void selectedLocation(String location, String city);
     }
 
 }

@@ -45,6 +45,23 @@ public class GeoSearchModel {
 
     }
 
+    public static String getAdminArea(double latitude, double longitude,Context context){
+
+        String address = "";
+        Geocoder geocoder = new Geocoder(context, Locale.getDefault());
+        try {
+            if (geocoder.getFromLocation(latitude, longitude, 1) == null || geocoder.getFromLocation(latitude, longitude, 1).size() ==0)
+                return address;
+            Address geoAddress = geocoder.getFromLocation(latitude, longitude, 1).get(0);
+            address = geoAddress.getAdminArea();
+            return address;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return address;
+        }
+
+    }
+
     public static String fullAddressByLocation(double latitude, double longitude,Context context) {
         String address = "";
         Geocoder geocoder = new Geocoder(context, Locale.getDefault());

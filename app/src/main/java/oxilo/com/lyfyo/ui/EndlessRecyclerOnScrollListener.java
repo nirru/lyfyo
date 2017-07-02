@@ -3,6 +3,7 @@ package oxilo.com.lyfyo.ui;
 /**
  * Created by ericbasendra on 02/12/15.
  */
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
@@ -18,8 +19,18 @@ public abstract class EndlessRecyclerOnScrollListener extends RecyclerView.OnScr
 
     private LinearLayoutManager mLinearLayoutManager;
 
+    private boolean isUseLinearLayoutManager;
+    private boolean isUseGridLayoutManager;
+
     public EndlessRecyclerOnScrollListener(LinearLayoutManager linearLayoutManager) {
         this.mLinearLayoutManager = linearLayoutManager;
+        isUseLinearLayoutManager = true;
+    }
+
+    public EndlessRecyclerOnScrollListener(GridLayoutManager gridLayoutManager) {
+        this.mLinearLayoutManager = gridLayoutManager;
+        isUseGridLayoutManager = true;
+
     }
 
     @Override
@@ -28,8 +39,13 @@ public abstract class EndlessRecyclerOnScrollListener extends RecyclerView.OnScr
 
         visibleItemCount = recyclerView.getChildCount();
         totalItemCount = mLinearLayoutManager.getItemCount();
-        firstVisibleItem = mLinearLayoutManager.findFirstVisibleItemPosition();
+        if(isUseLinearLayoutManager && mLinearLayoutManager instanceof LinearLayoutManager){
+            firstVisibleItem = ((LinearLayoutManager) mLinearLayoutManager).findFirstVisibleItemPosition();
+        }
 
+        if(isUseGridLayoutManager && mLinearLayoutManager instanceof GridLayoutManager){
+            firstVisibleItem = ((GridLayoutManager) mLinearLayoutManager).findFirstVisibleItemPosition();
+        }
         if (loading) {
             if (totalItemCount > previousTotal) {
                 loading = false;

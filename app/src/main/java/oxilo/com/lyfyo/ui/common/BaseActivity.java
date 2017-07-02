@@ -3,6 +3,7 @@ package oxilo.com.lyfyo.ui.common;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Rect;
+import android.location.Location;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
@@ -19,11 +20,16 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 
 
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationRequest;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import oxilo.com.lyfyo.R;
 import oxilo.com.lyfyo.ui.BottomNavigationViewHelper;
 import oxilo.com.lyfyo.ui.fragments.DetailFragment;
+import oxilo.com.lyfyo.ui.fragments.FilterFragment;
+import oxilo.com.lyfyo.ui.fragments.FilterResultFragment;
 import oxilo.com.lyfyo.ui.fragments.HomeFragment;
 import oxilo.com.lyfyo.ui.fragments.LocationSearchFragment;
 import oxilo.com.lyfyo.ui.fragments.ServiceFragments;
@@ -32,7 +38,8 @@ import oxilo.com.lyfyo.ui.fragments.ServiceFragments;
  * Created by Nirmal Kumar on 01.09.16.
  */
 public abstract class BaseActivity extends AppCompatActivity implements HomeFragment.OnFragmentInteractionListener
-,DetailFragment.OnFragmentInteractionListener,ServiceFragments.OnFragmentInteractionListener,LocationSearchFragment.OnFragmentInteractionListener{
+,DetailFragment.OnFragmentInteractionListener,ServiceFragments.OnFragmentInteractionListener,LocationSearchFragment.OnFragmentInteractionListener,
+        FilterFragment.OnFragmentInteractionListener,FilterResultFragment.OnFragmentInteractionListener{
 
     @Nullable
     @BindView(R.id.toolbar)
@@ -65,6 +72,8 @@ public abstract class BaseActivity extends AppCompatActivity implements HomeFrag
             return false;
         }
     };
+
+
 
     @Override
     public void setContentView(int layoutResID) {
@@ -152,6 +161,7 @@ public abstract class BaseActivity extends AppCompatActivity implements HomeFrag
 //        fragmentTransaction.addToBackStack(null);/**Enable this in fragment call not in activity*/
         fragmentTransaction.commit();
     }
+
 
     public void startFragment(Fragment fragment,Context context) {
         FragmentManager fragmentManager = getSupportFragmentManager();

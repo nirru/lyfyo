@@ -1,9 +1,11 @@
 package oxilo.com.lyfyo.ui.fragments;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.AppCompatCheckBox;
 import android.support.v7.widget.AppCompatRadioButton;
@@ -25,6 +27,10 @@ import butterknife.OnClick;
 import butterknife.Unbinder;
 import oxilo.com.lyfyo.R;
 import oxilo.com.lyfyo.ui.activity.FilterActivity;
+import oxilo.com.lyfyo.ui.activity.FilterResultActivity;
+import oxilo.com.lyfyo.ui.common.BaseActivity;
+
+import static android.app.Activity.RESULT_OK;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -111,8 +117,14 @@ public class FilterFragment extends Fragment implements CompoundButton.OnChecked
 
     Unbinder unbinder;
 
+    Filter filteListener;
+
     public FilterFragment() {
         // Required empty public constructor
+    }
+
+    public void setFilterListener(Filter filter){
+        this.filteListener = filter;
     }
 
     /**
@@ -381,16 +393,42 @@ public class FilterFragment extends Fragment implements CompoundButton.OnChecked
         if (massage)
             filterServices.add("Head Massage");
 
+
         for (int i = 0;i <filterServices.size();i++){
             stringBuilder.append(filterServices.get(i).trim());
             stringBuilder.append(ServiceFinderFragment.SEPARATOR);
         }
         String csv = stringBuilder.toString().trim();
+        if (csv.length()>0)
         csv = csv.substring(0, csv.length() - ServiceFinderFragment.SEPARATOR.length());
+        else
+            csv="";
 
         System.out.println(csv);
-        getActivity().finish();
+        Intent intent = new Intent(getActivity(), FilterResultActivity.class);
+        intent.putExtra("offer", offer);
+        intent.putExtra("rating",rating);
+        intent.putExtra("pouplar",popular);
+        intent.putExtra("recently",recently_add);
+        intent.putExtra("sortbycost",order_by_cost);
+        intent.putExtra("gender",gender);
+        intent.putExtra("csv",csv);
+        getActivity().finishAffinity();
+        getActivity().startActivity(intent);
+//        getActivity().setResult(RESULT_OK, intent);
+//        getActivity().finish();
 
+
+
+
+//        this.filteListener.ApplyFilter(offer,rating,popular,recently_add,order_by_cost,gender,csv);
+//        ((AppCompatActivity)getActivity()).getSupportFragmentManager().popBackStack();
+
+    }
+
+    interface Filter{
+        public void ApplyFilter(String offer,String rating,String popular,String recently
+        ,String order_by_cost,int gender,String csv);
     }
 
 }

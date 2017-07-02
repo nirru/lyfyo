@@ -1,9 +1,8 @@
 package oxilo.com.lyfyo.ui.modal;
 
 /**
- * Created by nikk on 27/6/17.
+ * Created by nikk on 1/7/17.
  */
-
 import java.util.List;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -15,6 +14,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
         "Id",
+        "BU_servicefor",
         "code",
         "businessName",
         "ownerName",
@@ -23,8 +23,6 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
         "phone",
         "mobile",
         "tag",
-        "description",
-        "shortdesc",
         "houseno",
         "address1",
         "address2",
@@ -33,14 +31,19 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
         "pincode",
         "cost",
         "avgcost",
+        "distance",
+        "sl_type",
+        "sl_rating",
         "category",
         "images"
 })
-public class Salon implements Parcelable
+public class FilterDatum implements Parcelable
 {
 
     @JsonProperty("Id")
     private String id;
+    @JsonProperty("BU_servicefor")
+    private String bUServicefor;
     @JsonProperty("code")
     private String code;
     @JsonProperty("businessName")
@@ -57,10 +60,6 @@ public class Salon implements Parcelable
     private String mobile;
     @JsonProperty("tag")
     private String tag;
-    @JsonProperty("description")
-    private String description;
-    @JsonProperty("shortdesc")
-    private String shortdesc;
     @JsonProperty("houseno")
     private String houseno;
     @JsonProperty("address1")
@@ -76,18 +75,27 @@ public class Salon implements Parcelable
     @JsonProperty("cost")
     private String cost;
     @JsonProperty("avgcost")
-    private Object avgcost;
+    private String avgcost;
+    @JsonProperty("distance")
+    private String distance;
+    @JsonProperty("sl_type")
+    private String slType;
+    @JsonProperty("sl_rating")
+    private String slRating;
     @JsonProperty("category")
-    private List<Object> category = null;
+    private List<Category> category = null;
     @JsonProperty("images")
     private List<Image> images = null;
-    public final static Parcelable.Creator<Salon> CREATOR = new Creator<Salon>() {
+    public final static Parcelable.Creator<FilterDatum> CREATOR = new Creator<FilterDatum>() {
+
+
         @SuppressWarnings({
                 "unchecked"
         })
-        public Salon createFromParcel(Parcel in) {
-            Salon instance = new Salon();
+        public FilterDatum createFromParcel(Parcel in) {
+            FilterDatum instance = new FilterDatum();
             instance.id = ((String) in.readValue((String.class.getClassLoader())));
+            instance.bUServicefor = ((String) in.readValue((String.class.getClassLoader())));
             instance.code = ((String) in.readValue((String.class.getClassLoader())));
             instance.businessName = ((String) in.readValue((String.class.getClassLoader())));
             instance.ownerName = ((String) in.readValue((String.class.getClassLoader())));
@@ -96,8 +104,6 @@ public class Salon implements Parcelable
             instance.phone = ((String) in.readValue((String.class.getClassLoader())));
             instance.mobile = ((String) in.readValue((String.class.getClassLoader())));
             instance.tag = ((String) in.readValue((String.class.getClassLoader())));
-            instance.description = ((String) in.readValue((String.class.getClassLoader())));
-            instance.shortdesc = ((String) in.readValue((String.class.getClassLoader())));
             instance.houseno = ((String) in.readValue((String.class.getClassLoader())));
             instance.address1 = ((String) in.readValue((String.class.getClassLoader())));
             instance.address2 = ((String) in.readValue((String.class.getClassLoader())));
@@ -105,14 +111,17 @@ public class Salon implements Parcelable
             instance.landmark = ((String) in.readValue((String.class.getClassLoader())));
             instance.pincode = ((String) in.readValue((String.class.getClassLoader())));
             instance.cost = ((String) in.readValue((String.class.getClassLoader())));
-            instance.avgcost = ((Object) in.readValue((Object.class.getClassLoader())));
-            in.readList(instance.category, (java.lang.Object.class.getClassLoader()));
-            in.readList(instance.images, (oxilo.com.lyfyo.ui.modal.Image.class.getClassLoader()));
+            instance.avgcost = ((String) in.readValue((String.class.getClassLoader())));
+            instance.distance = ((String) in.readValue((String.class.getClassLoader())));
+            instance.slType = ((String) in.readValue((String.class.getClassLoader())));
+            instance.slRating = ((String) in.readValue((String.class.getClassLoader())));
+            in.readList(instance.category, (Category.class.getClassLoader()));
+            in.readList(instance.images, (Image.class.getClassLoader()));
             return instance;
         }
 
-        public Salon[] newArray(int size) {
-            return (new Salon[size]);
+        public FilterDatum[] newArray(int size) {
+            return (new FilterDatum[size]);
         }
 
     }
@@ -126,6 +135,16 @@ public class Salon implements Parcelable
     @JsonProperty("Id")
     public void setId(String id) {
         this.id = id;
+    }
+
+    @JsonProperty("BU_servicefor")
+    public String getBUServicefor() {
+        return bUServicefor;
+    }
+
+    @JsonProperty("BU_servicefor")
+    public void setBUServicefor(String bUServicefor) {
+        this.bUServicefor = bUServicefor;
     }
 
     @JsonProperty("code")
@@ -208,26 +227,6 @@ public class Salon implements Parcelable
         this.tag = tag;
     }
 
-    @JsonProperty("description")
-    public String getDescription() {
-        return description;
-    }
-
-    @JsonProperty("description")
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    @JsonProperty("shortdesc")
-    public String getShortdesc() {
-        return shortdesc;
-    }
-
-    @JsonProperty("shortdesc")
-    public void setShortdesc(String shortdesc) {
-        this.shortdesc = shortdesc;
-    }
-
     @JsonProperty("houseno")
     public String getHouseno() {
         return houseno;
@@ -299,22 +298,52 @@ public class Salon implements Parcelable
     }
 
     @JsonProperty("avgcost")
-    public Object getAvgcost() {
+    public String getAvgcost() {
         return avgcost;
     }
 
     @JsonProperty("avgcost")
-    public void setAvgcost(Object avgcost) {
+    public void setAvgcost(String avgcost) {
         this.avgcost = avgcost;
     }
 
+    @JsonProperty("distance")
+    public String getDistance() {
+        return distance;
+    }
+
+    @JsonProperty("distance")
+    public void setDistance(String distance) {
+        this.distance = distance;
+    }
+
+    @JsonProperty("sl_type")
+    public String getSlType() {
+        return slType;
+    }
+
+    @JsonProperty("sl_type")
+    public void setSlType(String slType) {
+        this.slType = slType;
+    }
+
+    @JsonProperty("sl_rating")
+    public String getSlRating() {
+        return slRating;
+    }
+
+    @JsonProperty("sl_rating")
+    public void setSlRating(String slRating) {
+        this.slRating = slRating;
+    }
+
     @JsonProperty("category")
-    public List<Object> getCategory() {
+    public List<Category> getCategory() {
         return category;
     }
 
     @JsonProperty("category")
-    public void setCategory(List<Object> category) {
+    public void setCategory(List<Category> category) {
         this.category = category;
     }
 
@@ -330,6 +359,7 @@ public class Salon implements Parcelable
 
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeValue(id);
+        dest.writeValue(bUServicefor);
         dest.writeValue(code);
         dest.writeValue(businessName);
         dest.writeValue(ownerName);
@@ -338,8 +368,6 @@ public class Salon implements Parcelable
         dest.writeValue(phone);
         dest.writeValue(mobile);
         dest.writeValue(tag);
-        dest.writeValue(description);
-        dest.writeValue(shortdesc);
         dest.writeValue(houseno);
         dest.writeValue(address1);
         dest.writeValue(address2);
@@ -348,6 +376,9 @@ public class Salon implements Parcelable
         dest.writeValue(pincode);
         dest.writeValue(cost);
         dest.writeValue(avgcost);
+        dest.writeValue(distance);
+        dest.writeValue(slType);
+        dest.writeValue(slRating);
         dest.writeList(category);
         dest.writeList(images);
     }
@@ -357,6 +388,3 @@ public class Salon implements Parcelable
     }
 
 }
-
-
-

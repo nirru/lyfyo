@@ -1,5 +1,6 @@
 package oxilo.com.lyfyo.ui.activity;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -28,10 +29,8 @@ import oxilo.com.lyfyo.R;
 import oxilo.com.lyfyo.network.api.ServiceFactory;
 import oxilo.com.lyfyo.network.api.WebService;
 import oxilo.com.lyfyo.ui.common.BaseActivity;
-import oxilo.com.lyfyo.ui.fragments.DetailFragment;
 import oxilo.com.lyfyo.ui.fragments.HomeFragment;
 import oxilo.com.lyfyo.ui.modal.PopularLocation;
-import oxilo.com.lyfyo.ui.modal.Salon;
 import retrofit2.Response;
 
 public class MainActivity extends BaseActivity {
@@ -110,11 +109,15 @@ public class MainActivity extends BaseActivity {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
-
         }
         else{
 
         }
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+    }
 }
+
