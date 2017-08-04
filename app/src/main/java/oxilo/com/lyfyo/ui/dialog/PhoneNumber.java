@@ -2,10 +2,15 @@ package oxilo.com.lyfyo.ui.dialog;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.BottomSheetDialogFragment;
+import android.support.design.widget.CoordinatorLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import butterknife.BindView;
@@ -14,6 +19,7 @@ import butterknife.OnClick;
 import butterknife.Unbinder;
 import oxilo.com.lyfyo.R;
 import oxilo.com.lyfyo.ui.activity.ProfileSetUpActivity;
+import oxilo.com.lyfyo.utils.DeviceUtils;
 
 /**
  * Created by nikk on 26/6/17.
@@ -28,10 +34,13 @@ public class PhoneNumber extends BottomSheetDialogFragment {
     @BindView(R.id.validate)
     TextView validate;
     Unbinder unbinder;
+    @BindView(R.id.mobile_number_xy)
+    EditText mobileNumberXy;
 
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+
 
     /**
      * Use this factory method to create a new instance of
@@ -50,6 +59,7 @@ public class PhoneNumber extends BottomSheetDialogFragment {
         fragment.setArguments(args);
         return fragment;
     }
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -70,6 +80,12 @@ public class PhoneNumber extends BottomSheetDialogFragment {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        addGlobaLayoutListener(getView());
+    }
+
+    @Override
     public void onDestroyView() {
         super.onDestroyView();
         unbinder.unbind();
@@ -77,13 +93,67 @@ public class PhoneNumber extends BottomSheetDialogFragment {
 
     @OnClick(R.id.validate)
     public void onViewClicked() {
-        dismiss();
-        Intent i = new Intent(getActivity(), ProfileSetUpActivity.class);
-        startActivity(i);
+        if (mobileNumberXy.getText().length()==10){
+            dismiss();
+            Intent i = new Intent(getActivity(), ProfileSetUpActivity.class);
+            i.putExtra("mobile",mobileNumberXy.getText().toString());
+            startActivity(i);
+        }
+        else{
+           mobileNumberXy.setError("Please enter valid mobile number");
+        }
+
     }
 
     @OnClick(R.id.clear)
     public void onCrossClicked() {
         dismiss();
     }
+
+    private void addGlobaLayoutListener(final View view) {
+        view.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+            @Override
+            public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
+                DeviceUtils deviceUtils=new DeviceUtils(getActivity());
+                setPeekHeight(deviceUtils.getHeight());
+                v.removeOnLayoutChangeListener(this);
+            }
+        });
+    }
+
+
+    private BottomSheetBehavior getBottomSheetBehaviour() {
+        CoordinatorLayout.LayoutParams layoutParams = (CoordinatorLayout.LayoutParams) ((View) getView().getParent()).getLayoutParams();
+        CoordinatorLayout.Behavior behavior = layoutParams.getBehavior();
+        if (behavior != null && behavior instanceof BottomSheetBehavior) {
+            ((BottomSheetBehavior) behavior).setBottomSheetCallback(mBottomSheetBehaviorCallback);
+            return (BottomSheetBehavior) behavior;
+        }
+        return null;
+    }
+
+    public void setPeekHeight(int peekHeight) {
+        BottomSheetBehavior behavior = getBottomSheetBehaviour();
+        if (behavior == null) {
+            return;
+        }
+        behavior.setPeekHeight(peekHeight);
+    }
+
+
+    private BottomSheetBehavior.BottomSheetCallback mBottomSheetBehaviorCallback = new BottomSheetBehavior.BottomSheetCallback() {
+
+        @Override
+        public void onStateChanged(@NonNull View bottomSheet, int newState) {
+            if (newState == BottomSheetBehavior.STATE_HIDDEN) {
+                dismiss();
+            }
+
+        }
+
+        @Override
+        public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+        }
+    };
+
 }

@@ -1,6 +1,7 @@
 package oxilo.com.lyfyo.ui.adapter;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Handler;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -12,16 +13,18 @@ import android.view.animation.Animation;
 import android.view.animation.ScaleAnimation;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
+import java.text.DecimalFormat;
 import java.util.List;
 
 import oxilo.com.lyfyo.R;
 import oxilo.com.lyfyo.ui.modal.FilterDatum;
-
+import oxilo.com.lyfyo.ui.modal.Result;
 
 
 /**
@@ -116,6 +119,14 @@ public class FilterListAdapter<T> extends RecyclerView.Adapter<RecyclerView.View
             dataSet.clear();
     }
 
+    public void clear(){
+        if (dataSet != null){
+            dataSet.clear();
+            notifyDataSetChanged();
+        }
+
+    }
+
     public void moveItem(int fromPosition, int toPosition) {
         final T model = dataSet.remove(fromPosition);
         dataSet.add(toPosition, model);
@@ -160,19 +171,42 @@ public class FilterListAdapter<T> extends RecyclerView.Adapter<RecyclerView.View
 
         if(holder instanceof EventViewHolder){
             T dataItem = dataSet.get(position);
-       ((EventViewHolder) holder).sl_name.setText(((FilterDatum)dataItem).getBusinessName());
-       ((EventViewHolder) holder).sl_location.setText(((FilterDatum)dataItem).getLocation() + "," + ((FilterDatum)dataItem).getDistance());
-        ((EventViewHolder) holder).sl_type.setText(((FilterDatum)dataItem).getSlType());
-            if (((FilterDatum)dataItem).getImages().size()>0){
-                final String image_Url =  ((FilterDatum)dataItem).getImages().get(0).getBimgPrimImg();
+       ((EventViewHolder) holder).sl_name.setText(((Result)dataItem).getBusinessName());
+            ((EventViewHolder) holder).sl_location_city.setText(((Result)dataItem).getLocation());
+       ((EventViewHolder) holder).sl_location.setText(((Result)dataItem).getDistance()+"");
+            ((EventViewHolder) holder).sl_votes.setText(((Result)dataItem).getSlVote() + " votes");
+        ((EventViewHolder) holder).sl_type.setText(((Result)dataItem).getSlType());
+//            if (((FilterDatum)dataItem).getOffers().size()>0){
+//                ((FilterListAdapter.EventViewHolder) holder).rl_offer.setVisibility(View.VISIBLE);
+//            }else{
+//                ((FilterListAdapter.EventViewHolder) holder).rl_offer.setVisibility(View.GONE);
+//            }
+                final String image_Url =  ((Result)dataItem).getBimgPrimImg();
                 if (image_Url!=null && !image_Url.equals("")){
                     Picasso
                             .with(mContext)
                             .load(image_Url)
                             .fit()
-                           .centerInside()// or .centerCrop() to avoid a stretched image
+                           .centerCrop()// or .centerCrop() to avoid a stretched image
                             .into(((EventViewHolder) holder).img);
 
+                }
+
+
+            if (!((Result)dataItem).getSlRating().equals("") && ((Result)dataItem).getSlRating() != null) {
+                double f = ((Result)dataItem).getSlRating();
+                if (f < 3) {
+                    ((FilterListAdapter.EventViewHolder) holder).sl_rating.setBackgroundColor(Color.RED);
+                } else if (f < 4 && f >= 3) {
+                    ((FilterListAdapter.EventViewHolder) holder).sl_rating.setBackgroundColor(mContext.getResources().getColor(R.color.yellow));
+                } else if (f >= 4) {
+                    ((FilterListAdapter.EventViewHolder) holder).sl_rating.setBackgroundColor(mContext.getResources().getColor(R.color.green_color));
+                }
+                try {
+                    DecimalFormat df = new DecimalFormat("#.#");
+                    ((FilterListAdapter.EventViewHolder) holder).sl_rating.setText(df.format(f) + "");
+                } catch (Exception ex) {
+                    ex.printStackTrace();
                 }
             }
         }
@@ -204,7 +238,8 @@ public class FilterListAdapter<T> extends RecyclerView.Adapter<RecyclerView.View
     // you provide access to all the views for a data item in a view holder
     public static class EventViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         protected ImageView img;
-        protected TextView sl_location,sl_type,sl_name,sl_rating,sl_votes,sl_discount;
+        protected TextView sl_location,sl_type,sl_name,sl_rating,sl_votes,sl_discount,sl_location_city;
+        protected RelativeLayout rl_offer;
         public EventViewHolder(View v) {
             super(v);
             img = (ImageView)v.findViewById(R.id.imageView);
@@ -214,6 +249,9 @@ public class FilterListAdapter<T> extends RecyclerView.Adapter<RecyclerView.View
             sl_rating = (TextView)v.findViewById(R.id.textView7) ;
             sl_votes = (TextView)v.findViewById(R.id.sl_votes) ;
             sl_discount = (TextView)v.findViewById(R.id.textView10) ;
+            sl_location_city = (TextView)v.findViewById(R.id.location);
+            rl_offer = (RelativeLayout) v.findViewById(R.id.rel_offer);
+            v.setOnClickListener(this);
         }
 
         @Override

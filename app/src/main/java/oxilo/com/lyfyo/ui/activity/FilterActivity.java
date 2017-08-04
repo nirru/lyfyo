@@ -8,19 +8,20 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
 
 import butterknife.ButterKnife;
 import oxilo.com.lyfyo.R;
+import oxilo.com.lyfyo.ui.common.BaseActivity;
 import oxilo.com.lyfyo.ui.fragments.FilterFragment;
 import oxilo.com.lyfyo.ui.fragments.ServiceFinderFragment;
 
-public class FilterActivity extends AppCompatActivity implements FilterFragment.OnFragmentInteractionListener,
-        ServiceFinderFragment.OnFragmentInteractionListener{
+public class FilterActivity extends BaseActivity{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_filter);
-        ButterKnife.bind(this);
+        setContentView(R.layout.activity_main);
+        getToolbar().setVisibility(View.GONE);
         if (savedInstanceState == null)
             startFragment(FilterFragment.newInstance("",""));
     }
@@ -31,19 +32,4 @@ public class FilterActivity extends AppCompatActivity implements FilterFragment.
 
     }
 
-    public void startFragment(Fragment fragment) {
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction =fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.content, fragment);
-//        fragmentTransaction.addToBackStack(null);/**Enable this in fragment call not in activity*/
-        fragmentTransaction.commit();
-    }
-
-    public void startFragment(Fragment fragment,Context context) {
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction =fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.content, fragment);
-        fragmentTransaction.addToBackStack(null);/**Enable this in fragment call not in activity*/
-        fragmentTransaction.commit();
-    }
 }

@@ -36,7 +36,7 @@ import retrofit2.Response;
 
 import static android.R.attr.data;
 
-public class FilterResultActivity extends BaseActivity implements FilterResultFragment.OnFragmentInteractionListener {
+public class FilterResultActivity extends BaseActivity  {
 
     public ArrayList<PopularLocation> popularLocations;
     private String offer;
@@ -53,23 +53,30 @@ public class FilterResultActivity extends BaseActivity implements FilterResultFr
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         getToolbar().setVisibility(View.GONE);
-        if (getIntent()!=null){
-            Bundle data = getIntent().getExtras();
-            offer = data.getString("offer");
-            rating = data.getString("rating");
-            popular = data.getString("pouplar");
-            recently_add = data.getString("recently");
-            order_by_cost = data.getString("sortbycost");
-            gender = data.getInt("gender", 1);
-            csv = data.getString("csv");
-        }
+//        if (getIntent()!=null){
+//            Bundle data = getIntent().getExtras();
+//            offer = data.getString("offer");
+//            rating = data.getString("rating");
+//            popular = data.getString("pouplar");
+//            recently_add = data.getString("recently");
+//            order_by_cost = data.getString("sortbycost");
+//            gender = data.getInt("gender", 1);
+//            csv = data.getString("csv");
+//        }
          popularLocations = new ArrayList<>();
 
        FilterResultFragment fi = FilterResultFragment.newInstance("","");
-        fi.setValue(offer ,rating,popular,recently_add,order_by_cost,gender,csv);
-            startFragment(fi);
+//       fi.setValue(offer ,rating,popular,recently_add,order_by_cost,gender,csv);
+       startFragment(fi);
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        LyfoPrefs lyfoPrefs = new LyfoPrefs();
+        lyfoPrefs.getEditor(FilterResultActivity.this);
+        lyfoPrefs.saveLocationVariable(true,FilterResultActivity.this);
+    }
 
     @Override
     public void onFragmentInteraction(Uri uri) {

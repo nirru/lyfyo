@@ -150,7 +150,6 @@ public class ServiceFinderAdapter<T> extends RecyclerView.Adapter<RecyclerView.V
 
     @Override
     public void onBindViewHolder(final RecyclerView.ViewHolder holder, int position) {
-
         if(holder instanceof EventViewHolder){
             T dataItem = dataSet.get(position);
             ((EventViewHolder) holder).ll1.setText(((Service)dataItem).getSEName());

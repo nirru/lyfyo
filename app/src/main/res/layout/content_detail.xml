@@ -54,7 +54,7 @@
                 android:text="Aswini Beauty care for ladies and kids"
                 android:textColor="@android:color/black"
                 android:gravity="center"
-                android:id="@+id/textView25"
+                android:id="@+id/sl_name"
                 android:layout_gravity="center"
                 android:layout_marginTop="4dp" />
 
@@ -70,7 +70,7 @@
                 android:paddingLeft="8dp"
                 android:paddingRight="8dp"
                 android:layout_gravity="center"
-                android:id="@+id/address" />
+                android:id="@+id/sl_address" />
 
             <RelativeLayout
                 android:id="@+id/rel_xy"

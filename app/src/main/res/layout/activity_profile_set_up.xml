@@ -87,7 +87,7 @@
             android:layout_marginEnd="16dp">
 
             <EditText
-                android:id="@+id/username"
+                android:id="@+id/usermobile"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textEmailAddress"
@@ -186,7 +186,7 @@
                 android:id="@+id/otp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="textEmailAddress"
+                android:inputType="number"
                 android:hint="Enter 4 digit OTP"/>
 
         </android.support.design.widget.TextInputLayout>

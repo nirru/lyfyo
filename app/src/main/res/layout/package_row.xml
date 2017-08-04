@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="175dp"
+    android:layout_height="230dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:cardUseCompatPadding="true"
+    app:cardCornerRadius="1dp">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="110dp">
+
+                <ImageView
+                    android:id="@+id/imageView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="fitXY"
+                    android:src="@drawable/ic_trending"/>
+
+                <TextView
+                    android:layout_width="60dp"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="3dp"
+                    android:paddingBottom="3dp"
+                    android:text="30%"
+                    android:gravity="center"
+                    android:textColor="@android:color/white"
+                    style="@style/TextAppearance.AppCompat.Small"
+                    android:layout_alignParentRight="true"
+                    android:background="@color/login_screen_bg_color"/>
+            </RelativeLayout>
+
+            <TextView
+                android:id="@+id/service_list"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:maxLines="2"
+                android:ellipsize="end"
+                android:paddingTop="2dp"
+                android:paddingLeft="5dp"
+                style="@style/Base.TextAppearance.AppCompat.Small"
+                android:text="Service list\neefefefefefefef"/>
+
+            <TextView
+                android:id="@+id/view_details"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="View Details"
+                android:padding="5dp"
+                android:textColor="@color/login_screen_bg_color"
+                style="@style/Base.TextAppearance.AppCompat.Small"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:alpha="0.5"
+                android:layout_marginTop="5dp"
+                android:background="#bdbdbd"/>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <RelativeLayout
+                    android:id="@+id/dsl_rl"
+                    android:layout_width="wrap_content"
+                    android:layout_height="20dp">
+
+                    <TextView
+                        android:id="@+id/main_price"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:paddingLeft="5dp"
+                        style="@style/Base.TextAppearance.AppCompat.Small"
+                        android:text="Rs 1380"/>
+
+                    <TextView
+                        android:id="@+id/cut_line"
+                        android:layout_width="wrap_content"
+                        android:layout_height="1dp"
+                        android:layout_alignLeft="@+id/main_price"
+                        android:layout_alignRight="@+id/main_price"
+                        android:layout_marginLeft="5dp"
+                        android:background="#bdbdbd"
+                        android:layout_centerInParent="true"
+                        style="@style/Base.TextAppearance.AppCompat.Small"/>
+
+                </RelativeLayout>
+
+                <TextView
+                    android:id="@+id/discount_price"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/login_screen_bg_color"
+                    android:layout_below="@+id/dsl_rl"
+                    android:paddingLeft="5dp"
+                    style="@style/Base.TextAppearance.AppCompat.Small"
+                    android:text="Rs 1980"/>
+
+
+
+                <TextView
+                    android:id="@+id/count_number"
+                    android:layout_width="50dp"
+                    android:layout_height="25dp"
+                    android:background="@drawable/rect_green"
+                    android:textColor="@color/green_color"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="5dp"
+                    android:textSize="14sp"
+                    android:text="Add"
+                    android:textStyle="bold"
+                    android:gravity="center"/>
+            </RelativeLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/popup"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:background="@android:color/black"
+            android:alpha="0.87">
+
+            <ImageView
+                android:id="@+id/img_clear"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:layout_gravity="right"
+                app:srcCompat="@drawable/ic_clear_black_24dp"/>
+
+            <TextView
+                android:id="@+id/total_services"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="10dp"
+                android:text="list"
+                android:textColor="@android:color/white"
+                style="@style/Base.TextAppearance.AppCompat.Small"/>
+        </LinearLayout>
+
+    </FrameLayout>
+
+
+
+</android.support.v7.widget.CardView>

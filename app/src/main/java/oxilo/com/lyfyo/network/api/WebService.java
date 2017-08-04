@@ -42,11 +42,23 @@ public interface WebService {
     @POST("index.php/APII/SalonByLocation")
     io.reactivex.Observable<Response<ResponseBody>> sallonByLocation(
             @Field("location") String location,
-            @Field("latitude") String latitude,
-            @Field("longitude") String longitude,
-            @Field("page") String page);
+            @Field("latitude") double latitude,
+            @Field("longitude") double longitude,
+            @Field("page") int page);
 
-//    @FormUrlEncoded
+    @FormUrlEncoded
+    @POST("index.php/APII/PresentingCollection")
+    io.reactivex.Observable<Response<ResponseBody>> presentingCollection(
+            @Field("sl_city") String location);
+
+    @FormUrlEncoded
+    @POST("index.php/APII/PresentingCollectionByid")
+    io.reactivex.Observable<Response<ResponseBody>> presentingCollectionById(
+            @Field("pcId") String id,
+            @Field("latitude") float latitude,
+            @Field("longitude") float longitude);
+
+    //    @FormUrlEncoded
     @GET("index.php/APII/SalonList")
     io.reactivex.Observable<Response<ResponseBody>> sallonList(
 //            @Field("page") int page
@@ -61,6 +73,28 @@ public interface WebService {
     @FormUrlEncoded
     @POST("index.php/APII/PopularLocation")
     io.reactivex.Observable<Response<ResponseBody>> popularLocation(
-            @Field("latitude") double latitude,
-            @Field("longitude") double longitude);
+            @Field("sl_city") String city);
+
+    @FormUrlEncoded
+    @POST("index.php/APII/ServiceAndSalonFilter")
+    io.reactivex.Observable<Response<ResponseBody>> SearchSallon(
+            @Field("filtername") String filtername,
+            @Field("sl_location") String sl_location,
+            @Field("latitude") float lat,
+            @Field("longitude") float lng,
+            @Field("page") int page);
+
+    @FormUrlEncoded
+    @POST("index.php/APII/Userlogin")
+    io.reactivex.Observable<Response<ResponseBody>> getOtp(
+            @Field("mobileNumber") String mobileNumber);
+
+    @FormUrlEncoded
+    @POST("index.php/APII/VerifyOTP")
+    io.reactivex.Observable<Response<ResponseBody>> verifyOtp(
+            @Field("mobileNumber") String mobileNumber,
+            @Field("OTP") String otp,
+            @Field("fname") String fname,
+            @Field("lname") String lname,
+            @Field("email") String email);
 }

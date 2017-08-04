@@ -23,6 +23,8 @@ public class LyfoPrefs {
     public static final String FILTER_ORDER_BY_COST="order_by_cost";
     public static final String FILTER_GENDER="gender";
     public static final String FILTER_CSV="csv";
+    public static final String LOGIN="login";
+    public static final String LOCATION="location";
 
     public LyfoPrefs(){
 
@@ -106,6 +108,22 @@ public class LyfoPrefs {
 
     public String getCsvVariable(Context context){
         return getLyfoPrefs(context).getString(FILTER_CSV,"Facial");
+    }
+
+    public  void saveLoginVariable(boolean isLogin,Context context){
+        getEditor(context).putBoolean(LOGIN,isLogin).apply();
+    }
+
+    public boolean getLoginVariable(Context context){
+        return getLyfoPrefs(context).getBoolean(LOGIN,false);
+    }
+
+    public  void saveLocationVariable(boolean needUpdate,Context context){
+        getEditor(context).putBoolean(LOCATION,needUpdate).apply();
+    }
+
+    public boolean getLocationVariable(Context context){
+        return getLyfoPrefs(context).getBoolean(LOCATION,true);
     }
 
     public  void saveLat(float lat,Context context){

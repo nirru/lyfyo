@@ -1,0 +1,119 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="oxilo.com.lyfyo.ui.fragments.CalenderFragment">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp">
+
+        <ImageView
+            android:id="@+id/back"
+            android:layout_width="60dp"
+            android:layout_height="match_parent"
+            android:scaleType="centerInside"
+            android:layout_centerVertical="true"
+            app:srcCompat="@drawable/ic_keyboard_backspace_black_24dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        style="@style/Base.TextAppearance.AppCompat.Medium"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:text="Select Date &amp; Time"/>
+
+        <TextView
+            android:id="@+id/done"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:textStyle="bold"
+            android:layout_alignParentRight="true"
+            android:text="Done"
+            style="@style/Base.TextAppearance.AppCompat.Small"
+            android:layout_centerVertical="true"
+
+            />
+
+    </RelativeLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#bdbdbd"
+        android:alpha="0.5"/>
+
+    <android.support.v7.widget.AppCompatSpinner
+        android:id="@+id/time_spinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center">
+
+    </android.support.v7.widget.AppCompatSpinner>
+
+    <com.lyfyo.calender.HorizontalCalendarView
+        android:id="@+id/calendarView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:textColorSelected="#FFFF"
+        app:textSizeDayName="14sp"
+        app:textSizeDayNumber="20sp">
+    </com.lyfyo.calender.HorizontalCalendarView>
+
+    <TextView
+        android:id="@+id/select_time"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:text="Select available time"/>
+
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"
+        android:layout_gravity="center">
+
+        <TextView
+            android:id="@+id/available"
+            android:layout_width="120dp"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:textSize="14sp"
+            android:background="@color/green_color"
+            android:textColor="@android:color/white"
+            android:text="Available"/>
+
+        <TextView
+            android:id="@+id/not_available"
+            android:layout_width="120dp"
+            android:layout_height="match_parent"
+            android:textSize="14sp"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:layout_toRightOf="@+id/available"
+            android:gravity="center"
+            android:background="#bdbdbd"
+            android:textColor="@android:color/white"
+            android:text="Not Available"/>
+
+    </RelativeLayout>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/timeview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp">
+    </android.support.v7.widget.RecyclerView>
+
+
+
+
+</LinearLayout>

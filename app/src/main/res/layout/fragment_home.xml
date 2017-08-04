@@ -91,104 +91,105 @@
 
 
         </RelativeLayout>
-        <android.support.v4.widget.NestedScrollView
-            android:id="@+id/constraint_rl"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/location_rl">
+        <!--<android.support.v4.widget.NestedScrollView-->
+            <!--android:id="@+id/constraint_rl"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_below="@+id/location_rl">-->
 
-            <android.support.constraint.ConstraintLayout
+            <RelativeLayout
+                android:id="@+id/constraint_rl"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_below="@+id/location_rl"
-                tools:context="oxilo.com.lyfyo.ui.fragments.HomeFragment">
-
+                android:layout_below="@+id/location_rl">
 
                 <android.support.v7.widget.RecyclerView
-                    android:layout_width="0dp"
-                    android:layout_height="100dp"
-                    android:layout_marginLeft="8dp"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    android:layout_marginRight="8dp"
-                    app:layout_constraintRight_toRightOf="parent"
                     android:id="@+id/cardView"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginEnd="8dp"
-                    app:layout_constraintTop_toTopOf="parent"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginRight="8dp"
                     android:layout_marginTop="8dp">
 
                 </android.support.v7.widget.RecyclerView>
 
-
-
-
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:text="Book By Venue"
-                    android:layout_marginLeft="8dp"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    android:layout_marginTop="16dp"
-                    app:layout_constraintTop_toBottomOf="@+id/cardView"
-                    android:layout_marginStart="8dp"
-                    android:id="@+id/textView3" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/cardView"
                     android:paddingTop="5dp"
                     android:paddingBottom="5dp"
                     android:gravity="center"
                     android:text="Near By Sallon &amp; Spa"
                     android:layout_marginLeft="8dp"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    android:layout_marginTop="7dp"
-                    app:layout_constraintTop_toBottomOf="@+id/textView3"
-                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="8dp"
                     android:id="@+id/textView4" />
 
                 <TextView
+                    android:id="@+id/see_all"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_below="@+id/cardView"
+                    android:layout_alignParentRight="true"
                     android:paddingLeft="10dp"
                     android:text="See All "
                     android:paddingTop="5dp"
                     android:paddingBottom="5dp"
                     android:layout_marginRight="8dp"
-                    app:layout_constraintRight_toRightOf="parent"
                     android:layout_marginTop="8dp"
-                    app:layout_constraintTop_toBottomOf="@+id/textView3"
                     android:layout_marginEnd="8dp" />
 
+
+
+
+
+
+
+
+
                 <View
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:background="#BDBDBD"
                     android:alpha="0.7"
                     android:layout_marginTop="8dp"
-                    app:layout_constraintTop_toBottomOf="@+id/textView4"
-                    android:layout_marginRight="8dp"
-                    app:layout_constraintRight_toRightOf="parent"
-                    android:layout_marginLeft="8dp"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginEnd="8dp"
+                    android:layout_below="@+id/see_all"
                     android:id="@+id/view" />
 
-                <android.support.v7.widget.RecyclerView
-                    android:layout_width="0dp"
+                <RelativeLayout
+                    android:id="@+id/near_by_rl"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="8dp"
-                    app:layout_constraintLeft_toLeftOf="parent"
                     android:layout_marginRight="8dp"
-                    app:layout_constraintRight_toRightOf="parent"
                     android:layout_marginTop="16dp"
-                    app:layout_constraintTop_toBottomOf="@+id/view"
-                    app:layout_constraintHorizontal_bias="0.497"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginEnd="8dp"
-                    android:id="@+id/recyclerView" />
+                    android:layout_below="@+id/view">
+
+                    <android.support.v7.widget.RecyclerView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/recyclerView" />
+
+                    <ProgressBar
+                        android:id="@+id/progress_bar_near_by"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:layout_marginBottom="8dp"
+                        android:visibility="gone"/>
+
+                    <TextView
+                        android:id="@+id/tv_nearby_saloon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:visibility="gone"
+                        android:text="No Nearby Saloon Found"/>
+
+                </RelativeLayout>
+
+
+
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -201,8 +202,9 @@
                     android:paddingBottom="5dp"
                     android:layout_marginStart="8dp"
                     android:id="@+id/textView5"
+                    android:visibility="gone"
                     android:layout_marginTop="16dp"
-                    app:layout_constraintTop_toBottomOf="@+id/recyclerView" />
+                    app:layout_constraintTop_toBottomOf="@+id/near_by_rl" />
 
 
                 <TextView
@@ -215,7 +217,7 @@
                     android:layout_marginTop="16dp"
                     android:paddingTop="5dp"
                     android:paddingBottom="5dp"
-                    app:layout_constraintTop_toBottomOf="@+id/recyclerView"
+                    android:visibility="visible"
                     android:layout_marginEnd="8dp" />
 
                 <View
@@ -231,6 +233,7 @@
                     app:layout_constraintTop_toBottomOf="@+id/textView5"
                     android:layout_marginStart="8dp"
                     android:layout_marginEnd="8dp"
+                    android:visibility="visible"
                     android:id="@+id/view2" />
 
                 <android.support.v7.widget.RecyclerView
@@ -245,6 +248,7 @@
                     app:layout_constraintHorizontal_bias="0.498"
                     android:layout_marginStart="8dp"
                     android:layout_marginEnd="8dp"
+                    android:visibility="gone"
                     android:id="@+id/recyclerView2" />
 
                 <TextView
@@ -259,12 +263,14 @@
                     android:layout_marginLeft="8dp"
                     app:layout_constraintLeft_toLeftOf="parent"
                     android:id="@+id/textView6"
+                    android:visibility="gone"
                     android:layout_marginStart="8dp" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="See All >>"
+                    android:visibility="gone"
                     android:gravity="center"
                     android:paddingTop="5dp"
                     android:paddingBottom="5dp"
@@ -277,6 +283,7 @@
                 <View
                     android:layout_width="0dp"
                     android:layout_height="1dp"
+                    android:visibility="gone"
                     android:background="#BDBDBD"
                     android:alpha="0.7"
                     android:layout_marginTop="16dp"
@@ -300,6 +307,7 @@
                     app:layout_constraintRight_toRightOf="parent"
                     android:layout_marginStart="8dp"
                     android:layout_marginEnd="8dp"
+                    android:visibility="gone"
                     android:id="@+id/recyclerView3" />
 
                 <TextView
@@ -317,10 +325,10 @@
                     android:layout_marginEnd="8dp"
                     app:layout_constraintHorizontal_bias="0.0" />
 
-            </android.support.constraint.ConstraintLayout>
+            </RelativeLayout>
 
 
-        </android.support.v4.widget.NestedScrollView>
+        <!--</android.support.v4.widget.NestedScrollView>-->
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/search_recyle_list"
@@ -338,6 +346,15 @@
             android:layout_centerInParent="true"
             android:visibility="gone" />
 
-
-
+       <TextView
+           android:id="@+id/no_result_found"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:gravity="center"
+           android:visibility="gone"
+           android:textAppearance="?android:textAppearanceLarge"
+           android:text="Sorry, We couldn't find matching result"
+           android:layout_centerVertical="true"
+           android:layout_marginTop="@dimen/activity_vertical_margin"
+           android:layout_centerHorizontal="true"/>
 </RelativeLayout>

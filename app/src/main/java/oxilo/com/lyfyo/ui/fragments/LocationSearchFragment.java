@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -17,6 +18,7 @@ import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
@@ -62,16 +64,19 @@ import oxilo.com.lyfyo.GeoSearchModel;
 import oxilo.com.lyfyo.LyfoPrefs;
 import oxilo.com.lyfyo.PermissionUtils;
 import oxilo.com.lyfyo.R;
-import oxilo.com.lyfyo.ui.modal.LocationModal;
 import oxilo.com.lyfyo.network.api.ServiceFactory;
 import oxilo.com.lyfyo.network.api.WebService;
 import oxilo.com.lyfyo.ui.EndlessRecyclerOnScrollListener;
-import oxilo.com.lyfyo.ui.activity.LoginActivity;
+import oxilo.com.lyfyo.ui.adapter.FilterListAdapter;
 import oxilo.com.lyfyo.ui.adapter.LocationListAdapter;
+import oxilo.com.lyfyo.ui.adapter.PopularLocationListAdapter;
+import oxilo.com.lyfyo.ui.modal.LocationModal;
+import oxilo.com.lyfyo.ui.modal.PopularLocation;
 import oxilo.com.lyfyo.ui.view.VerticalSpaceItemDecoration;
 import retrofit2.Response;
 
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
+import static android.app.Activity.RESULT_OK;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -96,6 +101,12 @@ public class LocationSearchFragment extends Fragment implements GoogleApiClient.
     RecyclerView recyleview;
     @BindView(R.id.location_search)
     EditText locationSearch;
+
+    ArrayList<PopularLocation> popularLocations;
+    @BindView(R.id.popular_recyle)
+    RecyclerView popularRecyle;
+    @BindView(R.id.no_popular_area)
+    TextView noPopularArea;
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -154,6 +165,7 @@ public class LocationSearchFragment extends Fragment implements GoogleApiClient.
     private ArrayList<LocationModal> locationModals;
     LocationListAdapter locationListAdapter;
     Select select;
+    private PopularLocationListAdapter popularLocationListAdapter;
 
     public LocationSearchFragment() {
         // Required empty public constructor
@@ -298,9 +310,68 @@ public class LocationSearchFragment extends Fragment implements GoogleApiClient.
         void onFragmentInteraction(Uri uri);
     }
 
-    private void initClassRefs() {
-        locationModals = new ArrayList<>();
+    private void getPopularLocation() {
+        LyfoPrefs lyfoPrefs = new LyfoPrefs();
+        lyfoPrefs.getLyfoPrefs(getActivity());
+        final String city = lyfoPrefs.getCity(getActivity());
+        try {
+            WebService webService = ServiceFactory.createRetrofitService(WebService.class);
+            webService.popularLocation(city)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Observer<Response<ResponseBody>>() {
+                        @Override
+                        public void onSubscribe(@io.reactivex.annotations.NonNull Disposable d) {
 
+                        }
+
+                        @Override
+                        public void onNext(@io.reactivex.annotations.NonNull Response<ResponseBody> responseBodyResponse) {
+                            String sd = "";
+                            try {
+                                sd = new String(responseBodyResponse.body().bytes());
+                                JSONObject mapping = new JSONObject(sd);
+                                ObjectMapper mapper = new ObjectMapper();
+                                mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+                                popularLocations = mapper.readValue(mapping.getString("Service"), new TypeReference<List<PopularLocation>>() {
+                                });
+                                for (PopularLocation popularLocation : popularLocations){
+                                    popularLocationListAdapter.addItem(popularLocation);
+                                }
+                                if (popularLocationListAdapter.dataSet.size()>0){
+                                    noPopularArea.setVisibility(View.GONE);
+                                }else{
+                                    noPopularArea.setVisibility(View.VISIBLE);
+                                    noPopularArea.setText("No popular area found for " + city);
+                                }
+
+
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                        @Override
+                        public void onError(@io.reactivex.annotations.NonNull Throwable e) {
+                            e.printStackTrace();
+                        }
+
+                        @Override
+                        public void onComplete() {
+
+                        }
+                    });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private void initClassRefs() {
+        popularLocations = new ArrayList<>();
+        locationModals = new ArrayList<>();
         locationSearch.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -328,9 +399,6 @@ public class LocationSearchFragment extends Fragment implements GoogleApiClient.
 
             }
         });
-
-
-
         LinearLayoutManager li1 = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
 
         li1.setSmoothScrollbarEnabled(true);
@@ -351,14 +419,63 @@ public class LocationSearchFragment extends Fragment implements GoogleApiClient.
         locationListAdapter.setOnItemClickListener(new LocationListAdapter.MyClickListener() {
             @Override
             public void onItemClick(int position, View v) {
-                if (locationListAdapter.dataSet.size()>0){
+                if (locationListAdapter.dataSet.size() > 0) {
                     LocationModal locationModal = (LocationModal) locationListAdapter.dataSet.get(position);
-                    select.selectedLocation(locationModal.getLName(),locationModal.getCity());
-                    ((AppCompatActivity) getActivity()).getSupportFragmentManager().popBackStack();
+//                    select.selectedLocation(locationModal.getLName(), locationModal.getCity());
+                    LyfoPrefs lyfo = new LyfoPrefs();
+                    lyfo.getEditor(getActivity());
+                    lyfo.saveCity(locationModal.getCity(), getActivity());
+                    lyfo.saveAdminArea(locationModal.getLName(), getActivity());
+//                    ((AppCompatActivity) getActivity()).getSupportFragmentManager().popBackStack();
+                    Intent intent = new Intent();
+                    getActivity().setResult(RESULT_OK, intent);
+                    getActivity().finish();
                 }
 
             }
         });
+
+
+         popularLocationListAdapter = new PopularLocationListAdapter(R.layout.popular_area_row, popularLocations, getActivity());
+        GridLayoutManager llm = new GridLayoutManager(getActivity(), 3);
+        llm.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+            @Override
+            public int getSpanSize(int position) {
+                switch (popularLocationListAdapter.getItemViewType(position)) {
+                    case FilterListAdapter.VIEW_ITEM:
+                        return 1;
+                    case FilterListAdapter.VIEW_PROG:
+                        return 3; //number of columns of the grid
+                    default:
+                        return -1;
+                }
+            }
+        });
+
+        popularRecyle.setLayoutManager(llm);
+
+        popularRecyle.setAdapter(popularLocationListAdapter);
+
+        popularLocationListAdapter.setOnItemClickListener(new PopularLocationListAdapter.MyClickListener() {
+            @Override
+            public void onItemClick(int position, View v) {
+                if (popularLocationListAdapter.dataSet.size() > 0) {
+                    LyfoPrefs lyfo = new LyfoPrefs();
+                    lyfo.getEditor(getActivity());
+                    lyfo.getLyfoPrefs(getActivity());
+                    PopularLocation locationModal = (PopularLocation) popularLocationListAdapter.dataSet.get(position);
+                    select.selectedLocation(locationModal.getLName(), lyfo.getCity(getActivity()));
+                    lyfo.saveAdminArea(locationModal.getLName(), getActivity());
+//                    ((AppCompatActivity) getActivity()).getSupportFragmentManager().popBackStack();
+                    Intent intent = new Intent();
+                    getActivity().setResult(RESULT_OK, intent);
+                    getActivity().finish();
+                }
+
+            }
+        });
+
+        getPopularLocation();
 
 
     }
@@ -452,7 +569,7 @@ public class LocationSearchFragment extends Fragment implements GoogleApiClient.
             LyfoPrefs lyfo = new LyfoPrefs();
             lyfo.getEditor(getActivity());
             lyfo.saveCity(city, getActivity());
-            lyfo.saveAdminArea(adminArea,getActivity());
+            lyfo.saveAdminArea(adminArea, getActivity());
             lyfo.saveLat((float) location.getLatitude(), getActivity());
             lyfo.saveLng((float) location.getLongitude(), getActivity());
             stopLocationUpdates();
@@ -536,7 +653,7 @@ public class LocationSearchFragment extends Fragment implements GoogleApiClient.
 
         @Override
         public void onDismiss(DialogInterface dialog) {
-          dialog.dismiss();
+            dialog.dismiss();
         }
     }
 

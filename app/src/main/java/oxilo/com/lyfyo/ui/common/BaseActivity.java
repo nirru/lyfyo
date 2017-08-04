@@ -27,6 +27,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import oxilo.com.lyfyo.R;
 import oxilo.com.lyfyo.ui.BottomNavigationViewHelper;
+import oxilo.com.lyfyo.ui.fragments.CalenderFragment;
 import oxilo.com.lyfyo.ui.fragments.DetailFragment;
 import oxilo.com.lyfyo.ui.fragments.FilterFragment;
 import oxilo.com.lyfyo.ui.fragments.FilterResultFragment;
@@ -39,7 +40,7 @@ import oxilo.com.lyfyo.ui.fragments.ServiceFragments;
  */
 public abstract class BaseActivity extends AppCompatActivity implements HomeFragment.OnFragmentInteractionListener
 ,DetailFragment.OnFragmentInteractionListener,ServiceFragments.OnFragmentInteractionListener,LocationSearchFragment.OnFragmentInteractionListener,
-        FilterFragment.OnFragmentInteractionListener,FilterResultFragment.OnFragmentInteractionListener{
+        FilterFragment.OnFragmentInteractionListener,CalenderFragment.OnFragmentInteractionListener{
 
     @Nullable
     @BindView(R.id.toolbar)

@@ -14,8 +14,8 @@ import android.location.Location;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
@@ -24,7 +24,9 @@ import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.StaggeredGridLayoutManager;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -56,10 +58,12 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
+import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.BiFunction;
 import io.reactivex.schedulers.Schedulers;
 import okhttp3.ResponseBody;
 import oxilo.com.lyfyo.ApplicationController;
@@ -69,16 +73,23 @@ import oxilo.com.lyfyo.PermissionUtils;
 import oxilo.com.lyfyo.R;
 import oxilo.com.lyfyo.network.api.ServiceFactory;
 import oxilo.com.lyfyo.network.api.WebService;
-import oxilo.com.lyfyo.ui.StggeredEndlessRecyclerOnScrollListener;
+import oxilo.com.lyfyo.ui.EndlessRecyclerOnScrollListener;
 import oxilo.com.lyfyo.ui.activity.DetailActivity;
+import oxilo.com.lyfyo.ui.activity.FilterActivity;
+import oxilo.com.lyfyo.ui.activity.FilterResultActivity;
+import oxilo.com.lyfyo.ui.activity.LocationSearchActivity;
 import oxilo.com.lyfyo.ui.adapter.FilterListAdapter;
+import oxilo.com.lyfyo.ui.adapter.HorizentalVerticalListAdapter;
 import oxilo.com.lyfyo.ui.adapter.OfferListAdapter;
 import oxilo.com.lyfyo.ui.adapter.SallonListAdapter;
-import oxilo.com.lyfyo.ui.common.BaseActivity;
 import oxilo.com.lyfyo.ui.modal.FilterDatum;
+import oxilo.com.lyfyo.ui.modal.PCollection;
+import oxilo.com.lyfyo.ui.modal.Result;
+import oxilo.com.lyfyo.ui.modal.ZipModal;
 import retrofit2.Response;
 
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
+import static android.app.Activity.RESULT_OK;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -88,7 +99,7 @@ import static android.Manifest.permission.ACCESS_FINE_LOCATION;
  * Use the {@link HomeFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class HomeFragment extends Fragment implements FilterFragment.Filter,LocationSearchFragment.Select, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
+public class HomeFragment extends Fragment implements FilterFragment.Filter, LocationSearchFragment.Select, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
         LocationListener, ActivityCompat.OnRequestPermissionsResultCallback {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -107,6 +118,8 @@ public class HomeFragment extends Fragment implements FilterFragment.Filter,Loca
 
     SallonListAdapter sallonListAdapter;
     OfferListAdapter offerListAdapter;
+//    NearBySaloonListAdapter nearBySaloonListAdapter;
+    HorizentalVerticalListAdapter horizentalVerticalListAdapter;
 
     @BindView(R.id.sublocality)
     TextView sublocality;
@@ -119,11 +132,17 @@ public class HomeFragment extends Fragment implements FilterFragment.Filter,Loca
     @BindView(R.id.admin_area)
     TextView adminArea;
     @BindView(R.id.constraint_rl)
-    NestedScrollView constraintRl;
+    RelativeLayout constraintRl;
     @BindView(R.id.search_recyle_list)
     RecyclerView searchRecyleList;
     @BindView(R.id.progress_bar)
     ProgressBar progressBar;
+    @BindView(R.id.no_result_found)
+    TextView noResultFound;
+    @BindView(R.id.progress_bar_near_by)
+    ProgressBar progressBarNearBy;
+    @BindView(R.id.tv_nearby_saloon)
+    TextView tvNearbySaloon;
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -186,32 +205,19 @@ public class HomeFragment extends Fragment implements FilterFragment.Filter,Loca
     private int gender;
     private String csv;
     private FilterListAdapter filterListAdapter;
-    private ArrayList<FilterDatum> filterdatamList;
-    private boolean isLocationNeedToUpdate=true;
-    private boolean isViewNeedUpdate=false;
+    private ArrayList<Result> filterdatamList;
+    private ArrayList<Result> neaDatumArrayList;
+    private boolean isViewNeedUpdate = false;
+    private boolean isSearchActive = false;
+    private boolean isTyopingGoing = false;
+    private ArrayList<PCollection> pcollectiosList;
 
 
     public HomeFragment() {
         // Required empty public constructor
     }
 
-    public void setValue(  String offer,
-             String rating,
-             String popular,
-            String recently_add,
-            String order_by_cost,
-            int gender,
-            String csv){
 
-          this.offer = offer;
-        this. rating= rating;
-        this.popular = popular;
-        this.recently_add = recently_add;
-        this. order_by_cost = order_by_cost;
-        this. gender = gender;
-        this.csv = csv;
-
-    }
 
     /**
      * Use this factory method to create a new instance of
@@ -247,40 +253,21 @@ public class HomeFragment extends Fragment implements FilterFragment.Filter,Loca
         }
     }
 
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        if (filterdatamList==null)
-            filterdatamList = new ArrayList<>();
-        outState.putParcelableArrayList("list", filterdatamList);
-        outState.putBoolean("update", isViewNeedUpdate);
-    }
 
     @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
-        if (savedInstanceState != null) {
-            //probably orientation change
-            filterdatamList = (ArrayList<FilterDatum>) savedInstanceState.getSerializable("list");
-//            isViewNeedUpdate = (Boolean)savedInstanceState.getBoolean("update");
-        } else {
-            if (filterdatamList != null) {
-                //returning from backstack, data is fine, do nothing
-                int size = filterdatamList.size();
-                if (isViewNeedUpdate)
-                  updateView();
-            } else {
-                //newly created, compute data
-//                myData = computeData();
-            }
-        }
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        // TODO: inflate a fragment view
+        View rootView = inflater.inflate(R.layout.fragment_home, container, false);
+        unbinder = ButterKnife.bind(this, rootView);
+        return rootView;
     }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         initClassRefrence();
+        makingSearchActiveIfTyped();
+        showNearByProgress(true);
     }
 
 
@@ -308,46 +295,36 @@ public class HomeFragment extends Fragment implements FilterFragment.Filter,Loca
         mListener = null;
     }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        // TODO: inflate a fragment view
-        View rootView = inflater.inflate(R.layout.fragment_home, container, false);
-        unbinder = ButterKnife.bind(this, rootView);
-
-        return rootView;
-    }
-
 
     @Override
     public void onResume() {
         super.onResume();
-        if (isLocationNeedToUpdate)
-            resumeService();
-//        if (isViewNeedUpdate)
-//            updateView();
         LyfoPrefs lyfoPrefs = new LyfoPrefs();
         lyfoPrefs.getLyfoPrefs(getActivity());
-        if (lyfoPrefs.getCity(getActivity())!=null)
-            sublocality.setText(lyfoPrefs.getCity(getActivity()));
-        if (lyfoPrefs.getAdminArea(getActivity())!=null)
-            adminArea.setText(lyfoPrefs.getAdminArea(getActivity()));
+        if (lyfoPrefs.getLocationVariable(getActivity())){
+            resumeService();
+        }
 
-        sallonListAdapter.setOnItemClickListener(new SallonListAdapter.MyClickListener() {
+//        nearBySaloonListAdapter.setOnItemClickListener(new NearBySaloonListAdapter.MyClickListener() {
+//            @Override
+//            public void onItemClick(int position, View v) {
+//                FilterDatum filterDatum = (FilterDatum) nearBySaloonListAdapter.dataSet.get(position);
+//                Intent i = new Intent(getActivity(), DetailActivity.class);
+//                i.putExtra("list", filterDatum);
+//                startActivity(i);
+//            }
+//        });
+
+        horizentalVerticalListAdapter.setOnItemClickListener(new HorizentalVerticalListAdapter.MyClickListener() {
             @Override
             public void onItemClick(int position, View v) {
+                FilterDatum filterDatum = (FilterDatum) horizentalVerticalListAdapter.dataSet.get(position);
                 Intent i = new Intent(getActivity(), DetailActivity.class);
+                i.putExtra("list", filterDatum);
                 startActivity(i);
             }
         });
 
-        if (filterListAdapter!=null){
-            filterListAdapter.setOnItemClickListener(new FilterListAdapter.MyClickListener() {
-                @Override
-                public void onItemClick(int position, View v) {
-
-                }
-            });
-        }
     }
 
     @Override
@@ -377,63 +354,31 @@ public class HomeFragment extends Fragment implements FilterFragment.Filter,Loca
 
     @OnClick(R.id.location_rl)
     public void onViewClicked() {
-        LocationSearchFragment locationSearchFragment = LocationSearchFragment.newInstance("", "");
-        locationSearchFragment.setSelectedListener(this);
-        ((BaseActivity) getActivity()).startFragment(locationSearchFragment, getActivity());
+        Intent i = new Intent(getActivity(), LocationSearchActivity.class);
+        startActivityForResult(i, 1);
     }
 
     @OnClick(R.id.filter)
     public void onFilterClicked() {
-//        Intent i = new Intent(getActivity(), FilterActivity.class);
-//        startActivityForResult(i, 1);
+        Intent i = new Intent(getActivity(), FilterActivity.class);
+        startActivityForResult(i, 2);
+    }
 
-        FilterFragment filterFragment =  FilterFragment.newInstance("","");
-        filterFragment.setFilterListener(this);
-        ((BaseActivity)getActivity()).startFragment(filterFragment,getActivity());
+    @OnClick(R.id.see_all)
+    public void onSeeAll() {
+        Intent i = new Intent(getActivity(), FilterResultActivity.class);
+        startActivity(i);
     }
 
     @Override
-    public void selectedLocation(final String location,final String city) {
-         isLocationNeedToUpdate = false;
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if (isAdded()) {
-                    if (location != null) {
-                        sublocality.setText(location);
-                        adminArea.setText(city);
-                    }
-
-                }
-            }
-        }, 700);
-
+    public void selectedLocation(final String location, final String city) {
 
     }
 
     @Override
     public void ApplyFilter(final String offer1, final String rating1, final String popular1, final String recently1, final String order_by_cost1, final int gender1, final String csv1) {
-        isLocationNeedToUpdate = false;
-        isViewNeedUpdate = true;
-        offer = offer1;
-        rating = rating1;
-        popular = popular1;
-        recently_add = recently1;
-        order_by_cost = order_by_cost1;
-        gender = gender1;
-        csv = csv1;
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if (isAdded()) {
-                    updateView();
-                    showProgress(true);
-                    applyFilter(1);
-                }
-            }
-        }, 700);
-    }
 
+    }
 
 
     /**
@@ -470,15 +415,32 @@ public class HomeFragment extends Fragment implements FilterFragment.Filter,Loca
     }
 
     private void initClassRefrence() {
+        neaDatumArrayList = new ArrayList<>();
+        pcollectiosList = new ArrayList<>();
         sallonListAdapter = new SallonListAdapter(R.layout.row, loadDummy(), getContext());
-        LinearLayoutManager li1 = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
+//        nearBySaloonListAdapter = new NearBySaloonListAdapter(R.layout.filter_row,neaDatumArrayList,getContext());
+//        LinearLayoutManager li1 = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false){
+//            @Override
+//            public boolean canScrollVertically() {
+//                return false;
+//            }
+//        };
+
+        horizentalVerticalListAdapter = new HorizentalVerticalListAdapter(R.layout.filter_row,neaDatumArrayList,pcollectiosList,getContext());
+        LinearLayoutManager li1 = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false){
+            @Override
+            public boolean canScrollVertically() {
+                return true;
+            }
+        };
         LinearLayoutManager li2 = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
         LinearLayoutManager li3 = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
         recyclerView.setLayoutManager(li1);
         recyclerView2.setLayoutManager(li2);
         recyclerView3.setLayoutManager(li3);
 
-        recyclerView.setAdapter(sallonListAdapter);
+//        recyclerView.setAdapter(nearBySaloonListAdapter);
+        recyclerView.setAdapter(horizentalVerticalListAdapter);
         recyclerView2.setAdapter(sallonListAdapter);
         recyclerView3.setAdapter(sallonListAdapter);
 
@@ -486,88 +448,176 @@ public class HomeFragment extends Fragment implements FilterFragment.Filter,Loca
         LinearLayoutManager li4 = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
         recyclerView4.setLayoutManager(li4);
         recyclerView4.setAdapter(offerListAdapter);
-    }
 
+        final LyfoPrefs lyfoPrefs = new LyfoPrefs();
+        lyfoPrefs.getLyfoPrefs(getActivity());
 
-
-
-//    @Override
-//    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        super.onActivityResult(requestCode, resultCode, data);
-//        if (requestCode == 1) {
-//            if (resultCode == RESULT_OK) {
-//                isLocationNeedToUpdate = false;
-//                 offer = data.getStringExtra("offer");
-//                 rating = data.getStringExtra("rating");
-//                 popular = data.getStringExtra("pouplar");
-//                 recently_add = data.getStringExtra("recently");
-//                 order_by_cost = data.getStringExtra("sortbycost");
-//                 gender = data.getIntExtra("gender", 1);
-//                 csv = data.getStringExtra("csv");
-//                System.out.println(csv);
-//                constraintRl.setVisibility(View.GONE);
-//                searchRecyleList.setVisibility(View.VISIBLE);
-//                showProgress(true);
-//
-////                if (filterListAdapter!=null){
-////                    filterListAdapter.clearItem();
-////                    filterListAdapter.notifyDataSetChanged();
-////                }
-//                StaggeredGridLayoutManager llm = new StaggeredGridLayoutManager(2,
-//                        StaggeredGridLayoutManager.VERTICAL);
-//                searchRecyleList.setLayoutManager(llm);
-//                 filterdatamList = new ArrayList<>();
-//                 filterListAdapter = new FilterListAdapter(R.layout.filter_row,filterdatamList,getActivity());
-//                 searchRecyleList.setAdapter(filterListAdapter);
-//                searchRecyleList.addOnScrollListener(new StggeredEndlessRecyclerOnScrollListener(llm) {
-//                    @Override
-//                    public void onLoadMore(int current_page) {
-//                        applyFilter(current_page);
-//                    }
-//                });
-//
-//                filterListAdapter.setOnItemClickListener(new FilterListAdapter.MyClickListener() {
-//                    @Override
-//                    public void onItemClick(int position, View v) {
-//
-//                    }
-//                });
-//
-//
-//
-//                applyFilter(1);
-//            }
-//        }
-//    }
-
-    private void updateView(){
-        constraintRl.setVisibility(View.GONE);
-        searchRecyleList.setVisibility(View.VISIBLE);
-        StaggeredGridLayoutManager llm = new StaggeredGridLayoutManager(2,
-                StaggeredGridLayoutManager.VERTICAL);
-        searchRecyleList.setLayoutManager(llm);
-        if (filterdatamList==null)
-        filterdatamList = new ArrayList<>();
-        filterListAdapter = new FilterListAdapter(R.layout.filter_row,filterdatamList,getActivity());
-        searchRecyleList.setAdapter(filterListAdapter);
-        searchRecyleList.addOnScrollListener(new StggeredEndlessRecyclerOnScrollListener(llm) {
+        recyclerView.addOnScrollListener(new EndlessRecyclerOnScrollListener(li4) {
             @Override
             public void onLoadMore(int current_page) {
-                applyFilter(current_page);
+                recyclerView.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        horizentalVerticalListAdapter.addItem(null);
+                    }
+                });
+                getNearbySallon(lyfoPrefs.getLat(getActivity()),lyfoPrefs.getlng(getActivity()),sublocality.getText().toString(),adminArea.getText().toString(),current_page);
             }
         });
 
+
+
+        showNearByProgress(true);
     }
+
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1) {
+            if (resultCode == RESULT_OK) {
+                tvNearbySaloon.setVisibility(View.GONE);
+                LyfoPrefs lyfoPrefs = new LyfoPrefs();
+                lyfoPrefs.getEditor(getActivity());
+                lyfoPrefs.saveLocationVariable(false,getActivity());
+                lyfoPrefs.getLyfoPrefs(getActivity());
+                if (lyfoPrefs.getCity(getActivity()) != null)
+                    adminArea.setText(lyfoPrefs.getCity(getActivity()));
+                if (lyfoPrefs.getAdminArea(getActivity()) != null)
+                    sublocality.setText(lyfoPrefs.getAdminArea(getActivity()));
+                if (!progressBarNearBy.isShown())
+                showNearByProgress(true);
+//                getNearbySallon(lyfoPrefs.getLat(getActivity()),lyfoPrefs.getlng(getActivity()),sublocality.getText().toString(),adminArea.getText().toString(),1);
+                if (horizentalVerticalListAdapter!=null){
+                    horizentalVerticalListAdapter.clearItem();
+                    horizentalVerticalListAdapter.notifyDataSetChanged();
+                }
+
+                getNearbySallonOnLocationChange(lyfoPrefs.getLat(getActivity()),lyfoPrefs.getlng(getActivity()),sublocality.getText().toString(),adminArea.getText().toString(),1);
+            }
+        }
+
+        if (requestCode == 2) {
+            if (resultCode == RESULT_OK) {
+                LyfoPrefs lyfoPrefs = new LyfoPrefs();
+                lyfoPrefs.getLyfoPrefs(getActivity());
+                Bundle data1 = data.getExtras();
+                offer = data1.getString("offer");
+                rating = data1.getString("rating");
+                popular = data1.getString("pouplar");
+                recently_add = data1.getString("recently");
+                order_by_cost = data1.getString("sortbycost");
+                gender = data1.getInt("gender", 1);
+                csv = data1.getString("csv");
+                if (!progressBar.isShown())
+                    showProgress(true);
+                updateView();
+                applyFilter(1);
+            }
+        }
+    }
+
+    private void makingSearchActiveIfTyped() {
+        search.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (s.length() > 0) {
+                    isSearchActive = true;
+                    if (!isTyopingGoing) {
+                        isTyopingGoing = true;
+                        updateView();
+                    }
+                    if (filterListAdapter != null)
+                        filterListAdapter.clear();
+                    if (!progressBar.isShown())
+                        showProgress(true);
+                    searchSallon(1, s.toString());
+                } else {
+                    isTyopingGoing = false;
+                    constraintRl.setVisibility(View.VISIBLE);
+                    searchRecyleList.setVisibility(View.GONE);
+                }
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+    }
+
+    private void updateView() {
+        constraintRl.setVisibility(View.GONE);
+        searchRecyleList.setVisibility(View.VISIBLE);
+        LinearLayoutManager llm = new LinearLayoutManager(getActivity(),LinearLayoutManager.VERTICAL,false){
+            @Override
+            public boolean canScrollVertically() {
+                return true;
+            }
+        };
+//        llm.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+//            @Override
+//            public int getSpanSize(int position) {
+//                switch(filterListAdapter.getItemViewType(position)){
+//                    case FilterListAdapter.VIEW_ITEM:
+//                        return 1;
+//                    case FilterListAdapter.VIEW_PROG:
+//                        return 2; //number of columns of the grid
+//                    default:
+//                        return -1;
+//                }
+//            }
+//        });
+
+        searchRecyleList.setLayoutManager(llm);
+        if (filterdatamList==null)
+            filterdatamList = new ArrayList<>();
+        filterListAdapter = new FilterListAdapter(R.layout.filter_row,filterdatamList,getActivity());
+        searchRecyleList.setAdapter(filterListAdapter);
+        searchRecyleList.addOnScrollListener(new EndlessRecyclerOnScrollListener(llm) {
+            @Override
+            public void onLoadMore(int current_page) {
+                searchRecyleList.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        filterListAdapter.addItem(null);
+                    }
+                });
+                if (isSearchActive){
+                    searchSallon(current_page,search.getText().toString());
+                }else{
+                    applyFilter(current_page);
+                }
+            }
+        });
+
+        filterListAdapter.setOnItemClickListener(new FilterListAdapter.MyClickListener() {
+            @Override
+            public void onItemClick(int position, View v) {
+                FilterDatum filterDatum = (FilterDatum) filterListAdapter.dataSet.get(position);
+                Intent i = new Intent(getActivity(), DetailActivity.class);
+                i.putExtra("list", filterDatum);
+                startActivity(i);
+            }
+        });
+    }
+
     private void applyFilter(int page) {
         try {
             LyfoPrefs lyfoPrefs = new LyfoPrefs();
             lyfoPrefs.getLyfoPrefs(getActivity());
-            String location = "Malad";
+            String location = sublocality.getText().toString();
             double lat = lyfoPrefs.getLat(getActivity());
             double lng = lyfoPrefs.getlng(getActivity());
             WebService webService = ServiceFactory.createRetrofitService(WebService.class);
-            webService.filter(order_by_cost,rating,recently_add,csv,offer,gender,popular,location,
-                    lat,lng,page)
+            webService.filter(order_by_cost, rating, recently_add, csv, offer, gender, popular, location,
+                    lat, lng, page)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(new Observer<Response<ResponseBody>>() {
@@ -583,12 +633,23 @@ public class HomeFragment extends Fragment implements FilterFragment.Filter,Loca
                                 String sd = new String(responseBodyResponse.body().bytes());
                                 JSONObject mapping = new JSONObject(sd);
                                 ObjectMapper mapper = new ObjectMapper();
+//                                mapper.enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
                                 mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-                                filterdatamList = mapper.readValue(mapping.getString("FilterData"), new TypeReference<List<FilterDatum>>(){});
-                                for (FilterDatum filter : filterdatamList) {
+                                filterdatamList = mapper.readValue(mapping.getString("FilterData"), new TypeReference<List<Result>>() {
+                                });
+                                if (filterListAdapter.dataSet.size()>0){
+                                    filterListAdapter.removeItem(filterListAdapter.dataSet.size()-1);
+                                }
+                                for (Result filter : filterdatamList) {
                                     filterListAdapter.addItem(filter);
                                 }
                                 showProgress(false);
+                                if (filterListAdapter.dataSet.size() == 0) {
+                                    noResultFound.setVisibility(View.VISIBLE);
+                                    noResultFound.setText("Sorry, We couldn't find result matching");
+                                } else {
+                                    noResultFound.setVisibility(View.GONE);
+                                }
 
                             } catch (IOException e) {
                                 e.printStackTrace();
@@ -612,6 +673,226 @@ public class HomeFragment extends Fragment implements FilterFragment.Filter,Loca
         }
     }
 
+    private void searchSallon(int page, String q) {
+        try {
+            LyfoPrefs lyfoPrefs = new LyfoPrefs();
+            lyfoPrefs.getLyfoPrefs(getActivity());
+            String location = lyfoPrefs.getAdminArea(getActivity());
+            float lat = lyfoPrefs.getLat(getActivity());
+            float lng = lyfoPrefs.getlng(getActivity());
+            WebService webService = ServiceFactory.createRetrofitService(WebService.class);
+            webService.SearchSallon(q, location,lat,lng, page)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Observer<Response<ResponseBody>>() {
+                        @Override
+                        public void onSubscribe(@NonNull Disposable d) {
+
+                        }
+
+                        @Override
+                        public void onNext(@NonNull Response<ResponseBody> responseBodyResponse) {
+                            try {
+                                isViewNeedUpdate = true;
+                                String sd = new String(responseBodyResponse.body().bytes());
+                                JSONObject mapping = new JSONObject(sd);
+                                ObjectMapper mapper = new ObjectMapper();
+//                                mapper.enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
+                                mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+                                filterdatamList = mapper.readValue(mapping.getString("ServiceAndSalonFilter"), new TypeReference<List<Result>>() {
+                                });
+                                if (filterListAdapter.dataSet.size() > 0) {
+                                    filterListAdapter.removeItem(filterListAdapter.dataSet.size() - 1);
+                                }
+                                for (Result filter : filterdatamList) {
+                                    filterListAdapter.addItem(filter);
+                                }
+                                showProgress(false);
+                                if (filterListAdapter.dataSet.size() == 0) {
+                                    noResultFound.setVisibility(View.VISIBLE);
+                                    noResultFound.setText("Sorry, We couldn't find result matching," + search.getText().toString());
+                                } else {
+                                    noResultFound.setVisibility(View.GONE);
+                                }
+
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                        @Override
+                        public void onError(@NonNull Throwable e) {
+                            e.printStackTrace();
+                        }
+
+                        @Override
+                        public void onComplete() {
+                        }
+                    });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void getNearbySallonOnLocationChange(double lat, double lng, String location ,String city,int page){
+       try {
+            WebService  webService = ServiceFactory.createRetrofitService(WebService.class);
+            Observable<Response<ResponseBody>> near_by_sallon_obs = webService.sallonByLocation(location, lat, lng, page)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread());
+
+            Observable<Response<ResponseBody>> pc_Collection_obs = webService.presentingCollection(city)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread());
+
+
+            Observable<ZipModal> finalObservable = Observable.zip(near_by_sallon_obs, pc_Collection_obs, new BiFunction<Response<ResponseBody>, Response<ResponseBody>, ZipModal>() {
+                @Override
+                public ZipModal apply(@NonNull Response<ResponseBody> responseBodyResponse, @NonNull Response<ResponseBody> responseBodyResponse2) throws Exception {
+                    ZipModal zipModal = new ZipModal();
+                    zipModal.setSallonResponse(responseBodyResponse);
+                    zipModal.setPcResponse(responseBodyResponse2);
+                    return zipModal;
+                }
+            });
+
+            finalObservable.subscribe(new Observer<ZipModal>() {
+                @Override
+                public void onSubscribe(@NonNull Disposable d) {
+
+                }
+
+                @Override
+                public void onNext(@NonNull ZipModal zipModal) {
+                    try {
+                        String sd = new String(zipModal.getSallonResponse().body().bytes());
+                        JSONObject mapping = new JSONObject(sd);
+                        ObjectMapper mapper = new ObjectMapper();
+                        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+//                        mapper.enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
+                        neaDatumArrayList = mapper.readValue(mapping.getString("Salon"), new TypeReference<List<Result>>() {
+                        });
+
+                        String sd1 = new String(zipModal.getPcResponse().body().bytes());
+                        JSONObject mapping1 = new JSONObject(sd1);
+                        ObjectMapper mapper1 = new ObjectMapper();
+                        mapper1.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+                        pcollectiosList = mapper.readValue(mapping1.getString("p_colledtion"), new TypeReference<List<PCollection>>() {
+                        });
+
+
+                        for (Result filter : neaDatumArrayList) {
+                            horizentalVerticalListAdapter.addItem(filter);
+                        }
+
+                        for (PCollection pcCollection : pcollectiosList) {
+                            pcCollection.setList(new ArrayList<Result>());
+                            horizentalVerticalListAdapter.addItem1(pcCollection);
+                        }
+
+                        horizentalVerticalListAdapter.initListArray();
+
+                        showNearByProgress(false);
+                        if (horizentalVerticalListAdapter.dataSet.size() == 0) {
+                            tvNearbySaloon.setVisibility(View.VISIBLE);
+                        } else {
+                            tvNearbySaloon.setVisibility(View.GONE);
+                        }
+
+                    }catch (Exception ex){
+                        ex.printStackTrace();
+                    }
+                }
+
+                @Override
+                public void onError(@NonNull Throwable e) {
+
+                }
+
+                @Override
+                public void onComplete() {
+
+                }
+            });
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void getNearbySallon(double lat, double lng, String location ,String city,int page) {
+        try {
+            WebService webService = ServiceFactory.createRetrofitService(WebService.class);
+
+            webService.sallonByLocation(location, lat, lng, page)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Observer<Response<ResponseBody>>() {
+                        @Override
+                        public void onSubscribe(@NonNull Disposable d) {
+
+                        }
+
+                        @Override
+                        public void onNext(@NonNull Response<ResponseBody> responseBodyResponse) {
+                            try {
+                                String sd = new String(responseBodyResponse.body().bytes());
+                                JSONObject mapping = new JSONObject(sd);
+                                ObjectMapper mapper = new ObjectMapper();
+                                mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+//                                mapper.enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
+                                neaDatumArrayList = mapper.readValue(mapping.getString("Salon"), new TypeReference<List<Result>>() {
+                                });
+//                                for (FilterDatum filter : neaDatumArrayList) {
+//                                    nearBySaloonListAdapter.addItem(filter);
+//                                }
+//                                showNearByProgress(false);
+//                                if (nearBySaloonListAdapter.dataSet.size() == 0) {
+//                                    tvNearbySaloon.setVisibility(View.VISIBLE);
+//                                } else {
+//                                    tvNearbySaloon.setVisibility(View.GONE);
+//                                }
+
+                                if (horizentalVerticalListAdapter.dataSet.size() > 0) {
+                                    horizentalVerticalListAdapter.removeItem(horizentalVerticalListAdapter.dataSet.size() - 1);
+                                }
+
+                                for (Result filter : neaDatumArrayList) {
+                                    horizentalVerticalListAdapter.addItem(filter);
+                                }
+
+                                showNearByProgress(false);
+                                if (horizentalVerticalListAdapter.dataSet.size() == 0) {
+                                    tvNearbySaloon.setVisibility(View.VISIBLE);
+                                } else {
+                                    tvNearbySaloon.setVisibility(View.GONE);
+                                }
+
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                        @Override
+                        public void onError(@NonNull Throwable e) {
+
+                        }
+
+                        @Override
+                        public void onComplete() {
+
+                        }
+                    });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
     /**
      * Shows the progress UI and hides the login form.
      */
@@ -629,8 +910,8 @@ public class HomeFragment extends Fragment implements FilterFragment.Filter,Loca
                         show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
                     @Override
                     public void onAnimationEnd(Animator animation) {
-                        if (isAdded() && searchRecyleList!=null)
-                        searchRecyleList.setVisibility(show ? View.GONE : View.VISIBLE);
+                        if (isAdded() && searchRecyleList != null)
+                            searchRecyleList.setVisibility(show ? View.GONE : View.VISIBLE);
                     }
                 });
 
@@ -639,8 +920,8 @@ public class HomeFragment extends Fragment implements FilterFragment.Filter,Loca
                         show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
                     @Override
                     public void onAnimationEnd(Animator animation) {
-                        if (isAdded() && progressBar!=null)
-                        progressBar.setVisibility(show ? View.VISIBLE : View.GONE);
+                        if (isAdded() && progressBar != null)
+                            progressBar.setVisibility(show ? View.VISIBLE : View.GONE);
                     }
                 });
             } else {
@@ -648,6 +929,50 @@ public class HomeFragment extends Fragment implements FilterFragment.Filter,Loca
                 // and hide the relevant UI components.
                 searchRecyleList.setVisibility(show ? View.VISIBLE : View.GONE);
                 searchRecyleList.setVisibility(show ? View.GONE : View.VISIBLE);
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+    }
+
+
+    /**
+     * Shows the progress UI and hides the login form.
+     */
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
+    public void showNearByProgress(final boolean show) {
+        // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
+        // for very easy animations. If available, use these APIs to fade-in
+        // the progress spinner.
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
+                int shortAnimTime = 200;
+
+                recyclerView.setVisibility(show ? View.GONE : View.VISIBLE);
+                recyclerView.animate().setDuration(shortAnimTime).alpha(
+                        show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        if (isAdded() && recyclerView != null)
+                            recyclerView.setVisibility(show ? View.GONE : View.VISIBLE);
+                    }
+                });
+
+                progressBarNearBy.setVisibility(show ? View.VISIBLE : View.GONE);
+                progressBarNearBy.animate().setDuration(shortAnimTime).alpha(
+                        show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        if (isAdded() && progressBar != null)
+                            progressBarNearBy.setVisibility(show ? View.VISIBLE : View.GONE);
+                    }
+                });
+            } else {
+                // The ViewPropertyAnimator APIs are not available, so simply show
+                // and hide the relevant UI components.
+                recyclerView.setVisibility(show ? View.VISIBLE : View.GONE);
+                recyclerView.setVisibility(show ? View.GONE : View.VISIBLE);
             }
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -751,6 +1076,10 @@ public class HomeFragment extends Fragment implements FilterFragment.Filter,Loca
 
             this.adminArea.setText(adminArea);
             this.sublocality.setText(city);
+
+            lyfo.getLyfoPrefs(getActivity());
+
+            getNearbySallon(lyfo.getLat(getActivity()),lyfo.getlng(getActivity()),lyfo.getAdminArea(getActivity()),lyfo.getCity(getActivity()),1);
         }
     }
 
@@ -879,5 +1208,4 @@ public class HomeFragment extends Fragment implements FilterFragment.Filter,Loca
             buildGoogleApiClient();
         }
     }
-
 }

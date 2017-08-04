@@ -14,12 +14,14 @@ import android.support.v7.app.AlertDialog;
 
 public class ApplicationController extends Application {
 
+    private AppPrefs appPrefs;
     private static ApplicationController mInstance;
 
     @Override
     public void onCreate() {
         super.onCreate();
         mInstance = this;
+        appPrefs = AppPrefs.getComplexPreferences(getBaseContext(), "lyfo_prefs", MODE_PRIVATE);
 //        refWatcher = LeakCanary.install(this);
     }
 
@@ -54,5 +56,12 @@ public class ApplicationController extends Application {
         dialog.setCanceledOnTouchOutside(false);
         // display dialog
         dialog.show();
+    }
+
+    public AppPrefs getAppPrefs() {
+        if(appPrefs != null) {
+            return appPrefs;
+        }
+        return null;
     }
 }

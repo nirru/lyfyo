@@ -6,4 +6,5 @@ package oxilo.com.lyfyo;
 
 public class AppConstant {
     public static final String DEVELOPMENT_BASE_URL="http://54.64.166.252/";
+    public static final String USER_DETAIL = "user_detail";
 }

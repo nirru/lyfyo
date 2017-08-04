@@ -3,26 +3,28 @@ package oxilo.com.lyfyo.ui.fragments;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.widget.NestedScrollView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import oxilo.com.lyfyo.R;
-import oxilo.com.lyfyo.ui.adapter.OfferListAdapter;
-import oxilo.com.lyfyo.ui.adapter.SallonListAdapter;
+import oxilo.com.lyfyo.ui.EndlessRecyclerOnScrollListener;
+import oxilo.com.lyfyo.ui.activity.DetailActivity;
 import oxilo.com.lyfyo.ui.adapter.ServiceListAdapter;
-import oxilo.com.lyfyo.ui.view.MyScrollView;
+import oxilo.com.lyfyo.ui.modal.Package;
+import oxilo.com.lyfyo.ui.modal.Service;
 import oxilo.com.lyfyo.ui.view.VerticalSpaceItemDecoration;
 
 /**
@@ -43,34 +45,20 @@ public class ServiceFragments extends Fragment {
     Unbinder unbinder;
 
     // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private ArrayList<Service> services;
+    private ArrayList<Package> mParam2;
 
     private ServiceListAdapter serviceListAdapter;
     private OnFragmentInteractionListener mListener;
 
-    MyScrollView myScrollView;
-    int y;
-    LinearLayoutManager li1;
+    TextView price_view;
+
+//    MyScrollView myScrollView;
+//    int y;
+//    LinearLayoutManager li1;
 
     public ServiceFragments() {
         // Required empty public constructor
-    }
-
-    public void setMyScrollView(MyScrollView myScrollView){
-        this.myScrollView = myScrollView;
-    }
-
-    public MyScrollView getMyScrollView(){
-        return  this.myScrollView;
-    }
-
-    public void setYCordinateOfViewPager(int y){
-        this.y = y;
-    }
-
-    public int getYCordinate(){
-        return y;
     }
 
     /**
@@ -82,11 +70,11 @@ public class ServiceFragments extends Fragment {
      * @return A new instance of fragment ServiceFragments.
      */
     // TODO: Rename and change types and number of parameters
-    public static ServiceFragments newInstance(String param1, String param2) {
+    public static ServiceFragments newInstance(List<Service> param1, List<Package>  param2) {
         ServiceFragments fragment = new ServiceFragments();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+        args.putParcelableArrayList(ARG_PARAM1, (ArrayList<? extends Parcelable>) param1);
+        args.putParcelableArrayList(ARG_PARAM2, (ArrayList<? extends Parcelable>) param2);
         fragment.setArguments(args);
         return fragment;
     }
@@ -95,9 +83,10 @@ public class ServiceFragments extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+            services = getArguments().getParcelableArrayList(ARG_PARAM1);
+            mParam2 = getArguments().getParcelableArrayList(ARG_PARAM2);
         }
+
     }
 
     @Override
@@ -160,17 +149,10 @@ public class ServiceFragments extends Fragment {
         void onFragmentInteraction(Uri uri);
     }
 
-    private ArrayList<String> loadDummy() {
-        ArrayList<String> list = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
-            list.add("" + i);
-        }
-        return list;
-    }
-
     private void initClassRefrence() {
-        serviceListAdapter = new ServiceListAdapter(R.layout.service_row, loadDummy(), getContext());
-        li1 = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false)
+        TextView price = ((DetailActivity)getActivity()).getPriceView();
+        serviceListAdapter = new ServiceListAdapter(R.layout.service_row, services, mParam2,price,getContext());
+        LinearLayoutManager li1 = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL,false)
         {
             @Override
             public boolean canScrollVertically() {
@@ -183,5 +165,13 @@ public class ServiceFragments extends Fragment {
         recylerview.addItemDecoration(
                 new VerticalSpaceItemDecoration(getActivity(), R.drawable.divider));
         recylerview.setAdapter(serviceListAdapter);
+
+        serviceListAdapter.setOnItemClickListener(new ServiceListAdapter.MyClickListener() {
+            @Override
+            public void onItemClick(int position, View v) {
+
+            }
+        });
     }
+
 }

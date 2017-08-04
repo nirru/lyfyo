@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import java.util.ArrayList;
 import java.util.List;
 
+import oxilo.com.lyfyo.ui.modal.Category;
 import oxilo.com.lyfyo.ui.modal.ServiceModal;
 
 /**
@@ -26,8 +27,8 @@ public class ServicesPagerAdapter extends FragmentStatePagerAdapter {
     private List<Fragment> myFragments;
     private Context context;
     int oldPosition = -1;
-    private ArrayList<ServiceModal> customCollectionArrayList;
-    public ServicesPagerAdapter(Context context, FragmentManager fm, List<Fragment> myFrags, ArrayList<ServiceModal>customCollectionArrayList) {
+    private ArrayList<Category> customCollectionArrayList;
+    public ServicesPagerAdapter(Context context, FragmentManager fm, List<Fragment> myFrags, ArrayList<Category>customCollectionArrayList) {
         super(fm);
         this.myFragments = myFrags;
         this.context = context;
@@ -67,7 +68,7 @@ public class ServicesPagerAdapter extends FragmentStatePagerAdapter {
         String PageTitle = "";
 
 
-        return customCollectionArrayList.get(position).getTitle();
+        return customCollectionArrayList.get(position).getCAName();
     }
 
     @Override

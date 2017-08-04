@@ -4,6 +4,7 @@ package oxilo.com.lyfyo.ui.modal;
  * Created by nikk on 1/7/17.
  */
 
+import java.util.ArrayList;
 import java.util.List;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -26,7 +27,8 @@ public class Category implements Parcelable
     @JsonProperty("CA_id")
     private String cAId;
     @JsonProperty("service")
-    private List<Service> service = null;
+    private List<Service> service = new ArrayList<>();
+    private List<Package> packages = new ArrayList<>();
     public final static Parcelable.Creator<Category> CREATOR = new Creator<Category>() {
 
 
@@ -34,10 +36,11 @@ public class Category implements Parcelable
                 "unchecked"
         })
         public Category createFromParcel(Parcel in) {
-            Category instance = new Category();
+             Category instance = new Category();
             instance.cAName = ((String) in.readValue((String.class.getClassLoader())));
             instance.cAId = ((String) in.readValue((String.class.getClassLoader())));
-            in.readList(instance.service, (oxilo.com.lyfyo.ui.modal.Service.class.getClassLoader()));
+            in.readList(instance.service, (Service.class.getClassLoader()));
+            in.readList(instance.packages, (Package.class.getClassLoader()));
             return instance;
         }
 
@@ -78,10 +81,19 @@ public class Category implements Parcelable
         this.service = service;
     }
 
+    public List<Package> getPackages() {
+        return packages;
+    }
+
+    public void setPackages(List<Package> packages) {
+        this.packages = packages;
+    }
+
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeValue(cAName);
         dest.writeValue(cAId);
         dest.writeList(service);
+        dest.writeList(packages);
     }
 
     public int describeContents() {

@@ -20,6 +20,8 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 public class Service implements Parcelable{
     private boolean isSelected;
 
+    private int count=0;
+
     @JsonProperty("SE_id")
     private String sEId;
     @JsonProperty("SE_name")
@@ -40,6 +42,7 @@ public class Service implements Parcelable{
             instance.sEName = ((String) in.readValue((String.class.getClassLoader())));
             instance.sECost = ((String) in.readValue((String.class.getClassLoader())));
             instance.sEDescription1 = ((String) in.readValue((String.class.getClassLoader())));
+            instance.count = ((Integer) in.readValue((Integer.class.getClassLoader())));
             return instance;
         }
 
@@ -95,6 +98,7 @@ public class Service implements Parcelable{
         dest.writeValue(sEName);
         dest.writeValue(sECost);
         dest.writeValue(sEDescription1);
+        dest.writeValue(count);
     }
 
     public int describeContents() {
@@ -109,5 +113,12 @@ public class Service implements Parcelable{
         isSelected = selected;
     }
 
+    public int getCount() {
+        return count;
+    }
+
+    public void setCount(int count) {
+        this.count = count;
+    }
 
 }

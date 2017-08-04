@@ -38,13 +38,20 @@
                        android:layout_width="match_parent"
                        android:layout_height="match_parent">
 
-                       <ImageView
+                       <android.support.v4.view.ViewPager
+                           android:id="@+id/img_pager"
                            android:layout_width="match_parent"
                            android:layout_height="200dp"
-                           android:scaleType="centerCrop"
-                           android:src="@drawable/imgpsh_fullsize"
-                           app:layout_collapseMode="parallax"
-                           app:layout_collapseParallaxMultiplier="0.7" />
+                           android:fitsSystemWindows="true"
+                           tools:listitem="@layout/pager_item" />
+
+                       <!--<ImageView-->
+                           <!--android:layout_width="match_parent"-->
+                           <!--android:layout_height="200dp"-->
+                           <!--android:scaleType="centerCrop"-->
+                           <!--android:src="@drawable/imgpsh_fullsize"-->
+                           <!--app:layout_collapseMode="parallax"-->
+                           <!--app:layout_collapseParallaxMultiplier="0.7" />-->
 
                        <ImageView
                            android:id="@+id/fav"
@@ -88,6 +95,7 @@
 
 
                 <TextView
+                    android:id="@+id/rating"
                     android:layout_width="55dp"
                     android:layout_height="35dp"
                     android:layout_marginBottom="15dp"

@@ -35,17 +35,14 @@ import retrofit2.Response;
 
 public class MainActivity extends BaseActivity {
 
-    public ArrayList<PopularLocation> popularLocations;
 
      @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         getToolbar().setVisibility(View.GONE);
-         popularLocations = new ArrayList<>();
         if (savedInstanceState == null)
             startFragment(HomeFragment.newInstance("",""));
-        getPopularLocation();
     }
 
     @Override
@@ -53,71 +50,19 @@ public class MainActivity extends BaseActivity {
 
     }
 
-    private void getPopularLocation(){
-        LyfoPrefs lyfoPrefs = new LyfoPrefs();
-        lyfoPrefs.getLyfoPrefs(MainActivity.this);
-        String city = lyfoPrefs.getCity(MainActivity.this);
 
-        if (city.equals(City.MUMBAI.toString()) || city.equals(City.PUNE.toString())
-                || city.equals(City.NAVIMUMBAI.toString()) || city.equals(City.BHUNESWAR.toString())
-            || city.equals(City.CHENNAI.toString()))
-        {
-
-            try {
-                WebService webService = ServiceFactory.createRetrofitService(WebService.class);
-                webService.popularLocation(lyfoPrefs.getLat(MainActivity.this),lyfoPrefs.getlng(MainActivity.this))
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(new Observer<Response<ResponseBody>>() {
-                            @Override
-                            public void onSubscribe(@NonNull Disposable d) {
-
-                            }
-
-                            @Override
-                            public void onNext(@NonNull Response<ResponseBody> responseBodyResponse) {
-                                String sd = null;
-                                try {
-                                    sd = new String(responseBodyResponse.body().bytes());
-                                    JSONObject mapping = new JSONObject(sd);
-                                    ObjectMapper mapper = new ObjectMapper();
-                                    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-                                    if (mapping.getInt("error_Code")==0){
-                                       popularLocations = mapper.readValue(mapping.getString("Service"), new TypeReference<List<PopularLocation>>(){});
-                                       Log.e("SIZE==","" + popularLocations.size());
-                                    }
-
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-
-
-                            }
-
-                            @Override
-                            public void onError(@NonNull Throwable e) {
-                                e.printStackTrace();
-                            }
-
-                            @Override
-                            public void onComplete() {
-
-                            }
-                        });
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        else{
-
-        }
-    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        LyfoPrefs lyfoPrefs = new LyfoPrefs();
+        lyfoPrefs.getEditor(MainActivity.this);
+        lyfoPrefs.saveLocationVariable(true,MainActivity.this);
     }
 }
 

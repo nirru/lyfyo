@@ -1,6 +1,7 @@
 package oxilo.com.lyfyo.ui.adapter;
 
 import android.content.Context;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -10,10 +11,15 @@ import android.view.animation.Animation;
 import android.view.animation.ScaleAnimation;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import java.util.List;
 
 import oxilo.com.lyfyo.R;
+import oxilo.com.lyfyo.ui.activity.DetailActivity;
+import oxilo.com.lyfyo.ui.modal.PCollection;
+import oxilo.com.lyfyo.ui.modal.Package;
+import oxilo.com.lyfyo.ui.modal.Service;
 
 
 /**
@@ -21,16 +27,21 @@ import oxilo.com.lyfyo.R;
  */
 public class ServiceListAdapter<T> extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
     private final int VIEW_ITEM = 1;
+    public static final int VIEW_HORIZENATAL_ITEM = 2;
     private final int VIEW_PROG = 0;
     private Context mContext;
     public List<T> dataSet;
+    List<T> packages;
     private static MyClickListener myClickListener;
     private int inflated_row;
+    TextView price;
 
-    public ServiceListAdapter(int inflated_row, List<T> productLists, Context mContext) {
+    public ServiceListAdapter(int inflated_row, List<T> productLists, List<T> packages,TextView price, Context mContext) {
         this.mContext = mContext;
         this.dataSet = productLists;
+        this.packages = packages;
         this.inflated_row = inflated_row;
+        this.price = price;
     }
     public void setOnItemClickListener(MyClickListener myClickListener) {
         this.myClickListener = myClickListener;
@@ -120,7 +131,13 @@ public class ServiceListAdapter<T> extends RecyclerView.Adapter<RecyclerView.Vie
 
     @Override
     public int getItemViewType(int position) {
-        return VIEW_ITEM ;
+        if (dataSet.get(position) == null)
+            return VIEW_PROG;
+        if (position  == 0)
+            return VIEW_HORIZENATAL_ITEM;
+        else
+            return VIEW_ITEM;
+//        return dataSet.get(position) == null ? VIEW_PROG : VIEW_ITEM ;
     }
 
     @Override
@@ -131,6 +148,11 @@ public class ServiceListAdapter<T> extends RecyclerView.Adapter<RecyclerView.Vie
                     from(parent.getContext()).
                     inflate(inflated_row, parent, false);
             vh = new EventViewHolder(itemView);
+        }
+        else if(viewType == VIEW_HORIZENATAL_ITEM){
+            View v = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.package_fragments, parent, false);
+            vh = new HorizenatlViewHolder(v);
         }
         else if(viewType == VIEW_PROG){
             View v = LayoutInflater.from(parent.getContext())
@@ -144,12 +166,80 @@ public class ServiceListAdapter<T> extends RecyclerView.Adapter<RecyclerView.Vie
     }
 
     @Override
-    public void onBindViewHolder(final RecyclerView.ViewHolder holder, int position) {
+    public void onBindViewHolder(final RecyclerView.ViewHolder holder, final int position) {
         if(holder instanceof EventViewHolder){
-            T dataItem = dataSet.get(position);
-//       ((EventViewHolder) holder).lbl3.setText(((Product)dataItem).getProductType());
-        }else{
-            ((ProgressViewHolder)holder).progressBar.setIndeterminate(true);
+            final T dataItem = dataSet.get(position);
+       ((EventViewHolder) holder).service_name.setText(((Service)dataItem).getSEName());
+       ((EventViewHolder) holder).service_price.setText(((Service)dataItem).getSECost());
+
+           ((EventViewHolder) holder).tv_minus.setTag(((EventViewHolder) holder));
+            ((EventViewHolder) holder).tv_plus.setTag(((EventViewHolder) holder));
+
+            ((EventViewHolder) holder).tv_minus.setId(position);
+            ((EventViewHolder) holder).tv_plus.setId(position);
+
+            if (((Service)dataItem).getCount()==0){
+                ((EventViewHolder) holder).tv_minus.setVisibility(View.GONE);
+                ((EventViewHolder) holder).tv_count_number.setText("Add");
+            }else{
+                ((EventViewHolder) holder).tv_minus.setVisibility(View.VISIBLE);
+                ((EventViewHolder) holder).tv_count_number.setText("" + ((Service)dataItem).getCount());
+            }
+
+            ((EventViewHolder) holder).tv_minus.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    EventViewHolder eventViewHolder = (EventViewHolder) v.getTag();
+                    T dataItem = dataSet.get((Integer) v.getId());
+                    Service service = ((Service)dataItem);
+                    if (((Service)dataItem).getCount()>1){
+                        int minus_value = service.getCount()-1;
+                        service.setCount(minus_value);
+                        eventViewHolder.tv_count_number.setText(minus_value + "");
+                    }
+                    else{
+                        service.setCount(0);
+                         eventViewHolder.tv_minus.setVisibility(View.GONE);
+                        eventViewHolder.tv_count_number.setText("Add");
+                    }
+                    double _price = ((DetailActivity)mContext).getTotal() - Double.parseDouble(service.getSECost());
+                    ((DetailActivity)mContext).setTotal(_price);
+                    price.setText("" + ((DetailActivity)mContext).getTotal());
+                }
+            });
+
+            ((EventViewHolder) holder).tv_plus.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                        EventViewHolder eventViewHolder = (EventViewHolder) v.getTag();
+                        T dataItem = dataSet.get((Integer) v.getId());
+                        Service service = ((Service)dataItem);//(Service) v.getTag();
+                        int plus_value = service.getCount() + 1;
+                        service.setCount(plus_value);
+                        double _price = ((DetailActivity)mContext).getTotal() + Double.parseDouble(service.getSECost());
+                        ((DetailActivity)mContext).setTotal(_price);
+                        eventViewHolder.tv_minus.setVisibility(View.VISIBLE);
+                        eventViewHolder.tv_count_number.setText(plus_value + "");
+                        price.setText("" + ((DetailActivity)mContext).getTotal());
+                }
+            });
+        }
+
+        else if (holder instanceof ServiceListAdapter.HorizenatlViewHolder) {
+            if (position > packages.size())
+                return;
+            if (packages.size()==0)
+                return;
+
+            T dataItem = packages.get(position);
+
+            LinearLayoutManager linearLayoutManager = new LinearLayoutManager(mContext, LinearLayoutManager.HORIZONTAL, false);
+            ((HorizenatlViewHolder) holder).recyclerView.setLayoutManager(linearLayoutManager);
+             PackageListAdapter nearBySaloonListAdapter = new PackageListAdapter(R.layout.package_row, packages,price, mContext);
+            ((HorizenatlViewHolder) holder).recyclerView.setAdapter(nearBySaloonListAdapter);
+        }
+        else if (holder instanceof ServiceListAdapter.ProgressViewHolder) {
+            ((ServiceListAdapter.ProgressViewHolder)holder).progressBar.setIndeterminate(true);
         }
     }
 
@@ -160,15 +250,6 @@ public class ServiceListAdapter<T> extends RecyclerView.Adapter<RecyclerView.Vie
         else
             return 0;
     }
-
-    @Override
-    public void onViewRecycled(RecyclerView.ViewHolder holder) {
-        super.onViewRecycled(holder);
-        Log.e("NAME is==","" + holder.getAdapterPosition());
-    }
-
-
-
 
     private void setFadeAnimation(View view) {
         ScaleAnimation anim = new ScaleAnimation(0.0f, 1.0f, 0.0f, 1.0f, Animation.RESTART, 0.5f, Animation.RESTART, 0.5f);
@@ -181,10 +262,17 @@ public class ServiceListAdapter<T> extends RecyclerView.Adapter<RecyclerView.Vie
     // you provide access to all the views for a data item in a view holder
     public static class EventViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
-        protected ImageView img;
+        public TextView service_name,service_price;
+        public TextView tv_minus,tv_plus,tv_count_number;
         public EventViewHolder(View v) {
             super(v);
-//            img = (ImageView)v.findViewById(R.id.image);
+           service_name = (TextView) v.findViewById(R.id.service_name);
+           service_price = (TextView)v.findViewById(R.id.service_price);
+           tv_minus = (TextView)v.findViewById(R.id.minus_btn);
+           tv_plus = (TextView)v.findViewById(R.id.plus_btn);
+            tv_count_number = (TextView)v.findViewById(R.id.count_number);
+//           tv_minus.setOnClickListener(this);
+//           tv_plus.setOnClickListener(this);
         }
 
         @Override
@@ -199,6 +287,15 @@ public class ServiceListAdapter<T> extends RecyclerView.Adapter<RecyclerView.Vie
                 e.printStackTrace();
 //                Toast.makeText(view.getContext(),"Click Event Null Ex", Toast.LENGTH_SHORT).show();
             }
+        }
+    }
+
+    public static class HorizenatlViewHolder extends RecyclerView.ViewHolder {
+        public RecyclerView recyclerView;
+        public HorizenatlViewHolder(View v) {
+            super(v);
+            recyclerView = (RecyclerView) v.findViewById(R.id.recyle_id);
+
         }
     }
 

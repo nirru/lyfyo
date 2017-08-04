@@ -34,8 +34,8 @@ import android.view.WindowManager;
 
 public class DeviceUtils {
 
-    private int screenWidth;
-    private int imageMaxAreaHeight;
+    Context ctx;
+    DisplayMetrics metrics;
 
     public static boolean isTablet(Resources res) {
         int screenLayoutMasked = res.getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK;
@@ -47,34 +47,44 @@ public class DeviceUtils {
     }
 
     public void windowManager(Context mContext){
-        WindowManager windowManager = (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
-        Display display = windowManager.getDefaultDisplay();
-        DisplayMetrics metrics = new DisplayMetrics();
+        this.ctx = mContext;
+        WindowManager wm = (WindowManager) ctx
+                .getSystemService(Context.WINDOW_SERVICE);
+
+        Display display = wm.getDefaultDisplay();
+        metrics = new DisplayMetrics();
         display.getMetrics(metrics);
-
-        screenWidth = metrics.widthPixels;
-        int screenHeight = metrics.heightPixels;
-
-        if (DeviceUtils.isTablet(mContext.getResources())) {
-            screenHeight = ((AppCompatActivity)mContext).getWindow().getAttributes().height;
-            screenWidth =  ((AppCompatActivity)mContext).getWindow().getAttributes().width;
-        }
-
-        // Make sure the description area below the image is at least 40% of the screen height
-        int minDetailsHeightInPx = Math.round(screenHeight * 0.4f);
-        int minDetailsWidthInPx = Math.round(screenHeight * 0.4f);
-
-        int maxHeightInPx = screenHeight - minDetailsHeightInPx ;
-        int maxWidthInPx = screenWidth - minDetailsWidthInPx;
-        imageMaxAreaHeight = Math.min(screenHeight, maxHeightInPx);
     }
 
-    public int getScreenWidth() {
-        return screenWidth;
+    public int getHeight() {
+        return metrics.heightPixels;
     }
 
-    public int getImageMaxAreaHeight() {
-        return imageMaxAreaHeight;
+    public int getWidth() {
+        return metrics.widthPixels;
     }
 
+    public int getRealHeight() {
+        return metrics.heightPixels / metrics.densityDpi;
+    }
+
+    public int getRealWidth() {
+        return metrics.widthPixels / metrics.densityDpi;
+    }
+
+    public int getDensity() {
+        return metrics.densityDpi;
+    }
+
+    public int getScale(int picWidth) {
+        Display display
+                = ((WindowManager) ctx.getSystemService(Context.WINDOW_SERVICE))
+                .getDefaultDisplay();
+        int width = display.getWidth();
+        Double val = new Double(width) / new Double(picWidth);
+        val = val * 100d;
+        return val.intValue();
+    }
 }
+
+

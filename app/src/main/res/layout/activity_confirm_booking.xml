@@ -1,0 +1,311 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:descendantFocusability="beforeDescendants"
+    android:focusableInTouchMode="true"
+    tools:context="oxilo.com.lyfyo.ui.activity.ConfirmBookingActivity">
+
+    <RelativeLayout
+        android:id="@+id/header"
+        android:layout_width="match_parent"
+        android:layout_height="50dp">
+
+        <ImageView
+            android:id="@+id/back"
+            android:layout_width="60dp"
+            android:layout_height="match_parent"
+            android:scaleType="centerInside"
+            app:srcCompat="@drawable/ic_keyboard_backspace_black_24dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:gravity="center"
+            android:textStyle="bold"
+            style="@style/Base.TextAppearance.AppCompat.Medium"
+            android:text="Appointment Details"/>
+    </RelativeLayout>
+
+   <ScrollView
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:layout_above="@+id/confirm_booking"
+       android:layout_below="@+id/header">
+
+       <LinearLayout
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:orientation="vertical">
+
+           <TextView
+               android:layout_width="match_parent"
+               android:layout_height="1dp"
+               android:background="#bdbdbd"/>
+
+           <RelativeLayout
+               android:layout_width="match_parent"
+               android:layout_height="60dp">
+
+               <ImageView
+                   android:id="@+id/img_time"
+                   android:layout_width="60dp"
+                   android:layout_height="match_parent"
+                   android:scaleType="centerInside"
+                   android:layout_centerVertical="true"
+                   app:srcCompat="@drawable/ic_access_time_grey_500_24dp"/>
+
+               <TextView
+                   android:id="@+id/tv_date"
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:layout_marginTop="10dp"
+                   android:text="Mon,22 July 2017"
+                   android:textColor="@android:color/black"
+                   android:layout_toRightOf="@+id/img_time"/>
+
+               <TextView
+                   android:id="@+id/tv_time"
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:layout_below="@+id/tv_date"
+                   android:text="9.00 AM - 12.30 PM"
+                   android:layout_toRightOf="@+id/img_time"/>
+
+
+
+           </RelativeLayout>
+           <TextView
+               android:layout_width="match_parent"
+               android:layout_height="1dp"
+               android:background="#bdbdbd"/>
+
+           <RelativeLayout
+               android:layout_width="match_parent"
+               android:layout_height="60dp">
+
+               <ImageView
+                   android:id="@+id/img_account"
+                   android:layout_width="60dp"
+                   android:layout_height="match_parent"
+                   android:scaleType="centerInside"
+                   android:layout_centerVertical="true"
+                   app:srcCompat="@drawable/ic_access_time_grey_500_24dp"/>
+
+               <TextView
+                   android:id="@+id/tv_name"
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:layout_centerVertical="true"
+                   android:text="User Name"
+                   android:textColor="@android:color/black"
+                   android:layout_toRightOf="@+id/img_account"/>
+
+
+           </RelativeLayout>
+
+           <TextView
+               android:layout_width="match_parent"
+               android:layout_height="1dp"
+               android:background="#bdbdbd"/>
+
+           <RelativeLayout
+               android:layout_width="match_parent"
+               android:layout_height="60dp">
+
+               <ImageView
+                   android:id="@+id/img_contact"
+                   android:layout_width="60dp"
+                   android:layout_height="match_parent"
+                   android:scaleType="centerInside"
+                   android:layout_centerVertical="true"
+                   app:srcCompat="@drawable/ic_access_time_grey_500_24dp"/>
+
+               <TextView
+                   android:id="@+id/tv_contact"
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:layout_centerVertical="true"
+                   android:text="1234567890"
+                   android:textColor="@android:color/black"
+                   android:layout_toRightOf="@+id/img_contact"/>
+
+
+           </RelativeLayout>
+
+           <TextView
+               android:layout_width="match_parent"
+               android:layout_height="1dp"
+               android:background="#bdbdbd"/>
+
+           <RelativeLayout
+               android:layout_width="match_parent"
+               android:layout_height="60dp">
+
+               <ImageView
+                   android:id="@+id/img_email"
+                   android:layout_width="60dp"
+                   android:layout_height="match_parent"
+                   android:scaleType="centerInside"
+                   android:layout_centerVertical="true"
+                   app:srcCompat="@drawable/ic_access_time_grey_500_24dp"/>
+
+               <TextView
+                   android:id="@+id/tv_email"
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:layout_centerVertical="true"
+                   android:text="Email"
+                   android:textColor="@android:color/black"
+                   android:layout_toRightOf="@+id/img_email"/>
+
+
+           </RelativeLayout>
+
+           <TextView
+               android:layout_width="match_parent"
+               android:layout_height="1dp"
+               android:background="#bdbdbd"/>
+
+           <RelativeLayout
+               android:layout_width="match_parent"
+               android:layout_height="60dp">
+
+               <ImageView
+                   android:id="@+id/img_service"
+                   android:layout_width="60dp"
+                   android:layout_height="match_parent"
+                   android:scaleType="centerInside"
+                   android:layout_centerVertical="true"
+                   app:srcCompat="@drawable/ic_access_time_grey_500_24dp"/>
+
+               <TextView
+                   android:id="@+id/tv_service"
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:layout_centerVertical="true"
+                   android:text="Hair Cut"
+                   android:textColor="@android:color/black"
+                   android:layout_toRightOf="@+id/img_service"/>
+
+
+           </RelativeLayout>
+
+           <TextView
+               android:layout_width="match_parent"
+               android:layout_height="1dp"
+               android:background="#bdbdbd"/>
+
+           <RelativeLayout
+               android:layout_width="match_parent"
+               android:layout_height="60dp">
+
+               <ImageView
+                   android:id="@+id/img_price"
+                   android:layout_width="60dp"
+                   android:layout_height="match_parent"
+                   android:scaleType="centerInside"
+                   android:layout_centerVertical="true"
+                   app:srcCompat="@drawable/ic_access_time_grey_500_24dp"/>
+
+               <TextView
+                   android:id="@+id/tv_price"
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:layout_centerVertical="true"
+                   android:text="Price"
+                   android:textColor="@android:color/black"
+                   android:layout_toRightOf="@+id/img_price"/>
+
+
+           </RelativeLayout>
+
+           <TextView
+               android:layout_width="match_parent"
+               android:layout_height="1dp"
+               android:background="#bdbdbd"/>
+
+           <RelativeLayout
+               android:layout_width="match_parent"
+               android:layout_height="60dp">
+
+               <ImageView
+                   android:id="@+id/img_promo"
+                   android:layout_width="60dp"
+                   android:layout_height="match_parent"
+                   android:scaleType="centerInside"
+                   android:layout_centerVertical="true"
+                   app:srcCompat="@drawable/ic_access_time_grey_500_24dp"/>
+
+               <EditText
+                   android:id="@+id/tv_promo"
+                   android:layout_width="180dp"
+                   android:layout_height="35dp"
+                   android:background="@drawable/rect_border"
+                   android:layout_centerVertical="true"
+                   android:hint="promo"
+                   android:paddingLeft="10dp"
+                   android:paddingRight="10dp"
+                   android:textColor="@android:color/black"
+                   android:layout_toRightOf="@+id/img_promo"/>
+
+
+           </RelativeLayout>
+
+           <TextView
+               android:layout_width="match_parent"
+               android:layout_height="40dp"
+               android:gravity="center|left"
+               android:paddingLeft="25dp"
+               android:textColor="@android:color/black"
+               android:text="Payment Method"
+               android:background="#bdbdbd"/>
+
+           <RelativeLayout
+               android:layout_width="match_parent"
+               android:layout_height="60dp">
+
+               <ImageView
+                   android:id="@+id/img_pay_on_cash"
+                   android:layout_width="60dp"
+                   android:layout_height="match_parent"
+                   android:scaleType="centerInside"
+                   android:layout_centerVertical="true"
+                   app:srcCompat="@drawable/ic_access_time_grey_500_24dp"/>
+
+               <TextView
+                   android:id="@+id/tv_pay_Cash"
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:layout_marginTop="10dp"
+                   android:text="Pay On Sallon"
+                   android:textStyle="bold"
+                   android:layout_toRightOf="@+id/img_pay_on_cash"/>
+
+               <TextView
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:layout_below="@+id/tv_pay_Cash"
+                   android:text="By Cash"
+                   android:textColor="@android:color/black"
+                   android:layout_toRightOf="@+id/img_pay_on_cash"/>
+
+           </RelativeLayout>
+       </LinearLayout>
+   </ScrollView>
+
+    <TextView
+        android:id="@+id/confirm_booking"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:background="@color/green_color"
+        android:gravity="center"
+        style="@style/Base.TextAppearance.AppCompat.Medium"
+        android:textColor="@android:color/white"
+        android:text="Confirm Booking"
+        android:layout_alignParentBottom="true"/>
+
+</RelativeLayout>
