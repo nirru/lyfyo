@@ -16,7 +16,7 @@ import oxilo.com.lyfyo.ui.common.BaseActivity;
 import oxilo.com.lyfyo.ui.fragments.FilterFragment;
 import oxilo.com.lyfyo.ui.fragments.ServiceFinderFragment;
 
-public class FilterActivity extends BaseActivity{
+public class FilterActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

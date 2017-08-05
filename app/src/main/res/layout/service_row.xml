@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="70dp"
+    android:layout_height="wrap_content"
+    android:paddingTop="10dp"
+    android:paddingBottom="10dp"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+
 
 <LinearLayout
     android:id="@+id/relative_layout"
@@ -11,6 +14,7 @@
     android:layout_centerVertical="true"
     android:layout_alignParentRight="true"
     android:layout_marginRight="10dp"
+    android:layout_marginTop="5dp"
     android:background="@drawable/rect_green">
 
     <TextView
@@ -51,9 +55,9 @@
 </LinearLayout>
 
 <RelativeLayout
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_centerVertical="true">
+    android:layout_toLeftOf="@+id/relative_layout">
 
     <TextView
         android:id="@+id/service_name"
@@ -87,6 +91,54 @@
         android:layout_below="@+id/service_name"
         android:layout_toRightOf="@+id/imageView8"
         android:textSize="14sp"/>
+
+
+
+    <RelativeLayout
+        android:id="@+id/offer_main_rl"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/service_price">
+
+        <ImageView
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            app:srcCompat="@drawable/rs_black"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="4dp"
+            android:id="@+id/imageView9" />
+
+        <TextView
+            android:id="@+id/offer_price"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="150"
+            android:textColor="@android:color/black"
+            android:layout_marginLeft="4dp"
+            android:layout_toRightOf="@+id/imageView9"
+            android:textSize="14sp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="2dp"
+            android:layout_centerVertical="true"
+            android:background="#000000"
+            android:layout_alignRight="@+id/offer_price"
+            android:layout_alignLeft="@+id/imageView9"/>
+
+        <TextView
+            android:id="@+id/off_avail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:paddingTop="2dp"
+            android:layout_toRightOf="@+id/offer_price"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:textColor="@color/login_screen_bg_color"
+            android:text="OFF 30 %"/>
+
+    </RelativeLayout>
 
 
 </RelativeLayout>

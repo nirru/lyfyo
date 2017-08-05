@@ -29,8 +29,13 @@ public class UserDetail {
     @JsonProperty("U_email")
     private String uEmail;
 
+    private String price = "";
+    private String service;
+    private String bu_id;
     private String date;
     private String time;
+    private String package_id = "";
+    private boolean isLoggedIn = false;
 
     @JsonProperty("U_id")
     public String getUId() {
@@ -96,5 +101,45 @@ public class UserDetail {
 
     public void setTime(String time) {
         this.time = time;
+    }
+
+    public String getPackage_id() {
+        return package_id;
+    }
+
+    public void setPackage_id(String package_id) {
+        this.package_id = package_id;
+    }
+
+    public boolean isLoggedIn() {
+        return isLoggedIn;
+    }
+
+    public void setLoggedIn(boolean loggedIn) {
+        isLoggedIn = loggedIn;
+    }
+
+    public String getBu_id() {
+        return bu_id;
+    }
+
+    public void setBu_id(String bu_id) {
+        this.bu_id = bu_id;
+    }
+
+    public String getPrice() {
+        return price;
+    }
+
+    public void setPrice(String price) {
+        this.price = price;
+    }
+
+    public String getService() {
+        return service;
+    }
+
+    public void setService(String service) {
+        this.service = service;
     }
 }

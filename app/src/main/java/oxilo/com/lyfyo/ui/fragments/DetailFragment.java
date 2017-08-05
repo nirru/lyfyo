@@ -13,6 +13,7 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -194,7 +195,7 @@ public class DetailFragment extends Fragment {
         else
             photos.setText(0 + "Photos");
         if (!filterDatum.getSlRating().equals("") && filterDatum.getSlRating() != null) {
-            double f = Double.parseDouble(filterDatum.getSlRating());
+            double f = filterDatum.getSlRating();
             if (f < 3) {
                 rating.setBackgroundColor(Color.RED);
             } else if (f < 4 && f >= 3) {
@@ -226,6 +227,7 @@ public class DetailFragment extends Fragment {
 
         categoryArrayList.add(category);
         categoryArrayList.addAll(filterDatum.getCategory());
+
 
         for (int i = 0; i < categoryArrayList.size(); i++) {
             ServiceFragments serviceFragments = ServiceFragments.newInstance(categoryArrayList.get(i).getService(), categoryArrayList.get(i).getPackages());

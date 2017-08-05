@@ -11,7 +11,10 @@ import android.view.animation.Animation;
 import android.view.animation.ScaleAnimation;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import org.w3c.dom.Text;
 
 import java.util.List;
 
@@ -170,13 +173,25 @@ public class ServiceListAdapter<T> extends RecyclerView.Adapter<RecyclerView.Vie
         if(holder instanceof EventViewHolder){
             final T dataItem = dataSet.get(position);
        ((EventViewHolder) holder).service_name.setText(((Service)dataItem).getSEName());
-       ((EventViewHolder) holder).service_price.setText(((Service)dataItem).getSECost());
+
 
            ((EventViewHolder) holder).tv_minus.setTag(((EventViewHolder) holder));
             ((EventViewHolder) holder).tv_plus.setTag(((EventViewHolder) holder));
 
             ((EventViewHolder) holder).tv_minus.setId(position);
             ((EventViewHolder) holder).tv_plus.setId(position);
+
+            if (((Service)dataItem).getSEOffer().equals("")){
+                ((EventViewHolder) holder).offer_avial.setVisibility(View.GONE);
+                ((EventViewHolder) holder).offer_main_rl.setVisibility(View.GONE);
+                ((EventViewHolder) holder).service_price.setText(((Service)dataItem).getSECost());
+            }else{
+                ((EventViewHolder) holder).offer_avial.setVisibility(View.VISIBLE);
+                ((EventViewHolder) holder).offer_main_rl.setVisibility(View.VISIBLE);
+                ((EventViewHolder) holder).service_price.setText(((Service)dataItem).getSEOfferPrice());
+                ((EventViewHolder) holder).offer_avial.setText(((Service)dataItem).getSEOffer() + " OFF");
+                ((EventViewHolder) holder).offer_price.setText(((Service)dataItem).getSECost());
+            }
 
             if (((Service)dataItem).getCount()==0){
                 ((EventViewHolder) holder).tv_minus.setVisibility(View.GONE);
@@ -198,11 +213,18 @@ public class ServiceListAdapter<T> extends RecyclerView.Adapter<RecyclerView.Vie
                         eventViewHolder.tv_count_number.setText(minus_value + "");
                     }
                     else{
-                        service.setCount(0);
+                         service.setCount(0);
                          eventViewHolder.tv_minus.setVisibility(View.GONE);
-                        eventViewHolder.tv_count_number.setText("Add");
+                         eventViewHolder.tv_count_number.setText("Add");
                     }
-                    double _price = ((DetailActivity)mContext).getTotal() - Double.parseDouble(service.getSECost());
+                    double _price ;
+                    if (service.getSEOfferPrice().equals("")){
+                        _price = ((DetailActivity)mContext).getTotal() - Double.parseDouble(service.getSECost());
+                    }
+                    else {
+                        _price = ((DetailActivity)mContext).getTotal() - Double.parseDouble(service.getSEOfferPrice());
+                    }
+//                    double _price = ((DetailActivity)mContext).getTotal() - Double.parseDouble(service.getSEOfferPrice());
                     ((DetailActivity)mContext).setTotal(_price);
                     price.setText("" + ((DetailActivity)mContext).getTotal());
                 }
@@ -216,7 +238,13 @@ public class ServiceListAdapter<T> extends RecyclerView.Adapter<RecyclerView.Vie
                         Service service = ((Service)dataItem);//(Service) v.getTag();
                         int plus_value = service.getCount() + 1;
                         service.setCount(plus_value);
-                        double _price = ((DetailActivity)mContext).getTotal() + Double.parseDouble(service.getSECost());
+                    double _price ;
+                    if (service.getSEOfferPrice().equals("")){
+                        _price = ((DetailActivity)mContext).getTotal() + Double.parseDouble(service.getSECost());
+                    }
+                    else {
+                        _price = ((DetailActivity)mContext).getTotal() + Double.parseDouble(service.getSEOfferPrice());
+                    }
                         ((DetailActivity)mContext).setTotal(_price);
                         eventViewHolder.tv_minus.setVisibility(View.VISIBLE);
                         eventViewHolder.tv_count_number.setText(plus_value + "");
@@ -264,6 +292,8 @@ public class ServiceListAdapter<T> extends RecyclerView.Adapter<RecyclerView.Vie
 
         public TextView service_name,service_price;
         public TextView tv_minus,tv_plus,tv_count_number;
+        public TextView offer_price,offer_avial;
+        public RelativeLayout  offer_main_rl;
         public EventViewHolder(View v) {
             super(v);
            service_name = (TextView) v.findViewById(R.id.service_name);
@@ -271,6 +301,9 @@ public class ServiceListAdapter<T> extends RecyclerView.Adapter<RecyclerView.Vie
            tv_minus = (TextView)v.findViewById(R.id.minus_btn);
            tv_plus = (TextView)v.findViewById(R.id.plus_btn);
             tv_count_number = (TextView)v.findViewById(R.id.count_number);
+            offer_price = (TextView)v.findViewById(R.id.offer_price);
+            offer_avial = (TextView)v.findViewById(R.id.off_avail);
+            offer_main_rl = (RelativeLayout) v.findViewById(R.id.offer_main_rl);
 //           tv_minus.setOnClickListener(this);
 //           tv_plus.setOnClickListener(this);
         }

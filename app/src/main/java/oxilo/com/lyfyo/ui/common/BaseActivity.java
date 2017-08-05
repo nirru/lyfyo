@@ -33,6 +33,7 @@ import oxilo.com.lyfyo.ui.fragments.FilterFragment;
 import oxilo.com.lyfyo.ui.fragments.FilterResultFragment;
 import oxilo.com.lyfyo.ui.fragments.HomeFragment;
 import oxilo.com.lyfyo.ui.fragments.LocationSearchFragment;
+import oxilo.com.lyfyo.ui.fragments.ServiceFinderFragment;
 import oxilo.com.lyfyo.ui.fragments.ServiceFragments;
 
 /**
@@ -40,7 +41,7 @@ import oxilo.com.lyfyo.ui.fragments.ServiceFragments;
  */
 public abstract class BaseActivity extends AppCompatActivity implements HomeFragment.OnFragmentInteractionListener
 ,DetailFragment.OnFragmentInteractionListener,ServiceFragments.OnFragmentInteractionListener,LocationSearchFragment.OnFragmentInteractionListener,
-        FilterFragment.OnFragmentInteractionListener,CalenderFragment.OnFragmentInteractionListener{
+        FilterFragment.OnFragmentInteractionListener,CalenderFragment.OnFragmentInteractionListener,ServiceFinderFragment.OnFragmentInteractionListener{
 
     @Nullable
     @BindView(R.id.toolbar)

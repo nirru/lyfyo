@@ -15,7 +15,9 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
         "SE_id",
         "SE_name",
         "SE_cost",
-        "SE_description1"
+        "SE_description1",
+        "SE_offer",
+        "SE_offerPrice"
 })
 public class Service implements Parcelable{
     private boolean isSelected;
@@ -30,6 +32,10 @@ public class Service implements Parcelable{
     private String sECost;
     @JsonProperty("SE_description1")
     private String sEDescription1;
+    @JsonProperty("SE_offer")
+    private String sEOffer;
+    @JsonProperty("SE_offerPrice")
+    private String sEOfferPrice;
     public final static Parcelable.Creator<Service> CREATOR = new Creator<Service>() {
 
 
@@ -42,7 +48,8 @@ public class Service implements Parcelable{
             instance.sEName = ((String) in.readValue((String.class.getClassLoader())));
             instance.sECost = ((String) in.readValue((String.class.getClassLoader())));
             instance.sEDescription1 = ((String) in.readValue((String.class.getClassLoader())));
-            instance.count = ((Integer) in.readValue((Integer.class.getClassLoader())));
+            instance.sEOffer = ((String) in.readValue((String.class.getClassLoader())));
+            instance.sEOfferPrice = ((String) in.readValue((String.class.getClassLoader())));
             return instance;
         }
 
@@ -50,8 +57,8 @@ public class Service implements Parcelable{
             return (new Service[size]);
         }
 
-    }
-            ;
+    };
+
 
     @JsonProperty("SE_id")
     public String getSEId() {
@@ -93,12 +100,32 @@ public class Service implements Parcelable{
         this.sEDescription1 = sEDescription1;
     }
 
+    @JsonProperty("SE_offer")
+    public String getSEOffer() {
+        return sEOffer;
+    }
+
+    @JsonProperty("SE_offer")
+    public void setSEOffer(String sEOffer) {
+        this.sEOffer = sEOffer;
+    }
+
+    @JsonProperty("SE_offerPrice")
+    public String getSEOfferPrice() {
+        return sEOfferPrice;
+    }
+
+    @JsonProperty("SE_offerPrice")
+    public void setSEOfferPrice(String sEOfferPrice) {
+        this.sEOfferPrice = sEOfferPrice;
+    }
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeValue(sEId);
         dest.writeValue(sEName);
         dest.writeValue(sECost);
         dest.writeValue(sEDescription1);
-        dest.writeValue(count);
+        dest.writeValue(sEOffer);
+        dest.writeValue(sEOfferPrice);
     }
 
     public int describeContents() {

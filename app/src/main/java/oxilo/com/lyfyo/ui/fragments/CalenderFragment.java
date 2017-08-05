@@ -420,6 +420,8 @@ public class CalenderFragment extends Fragment {
                 userDetail.setTime(time);
                 ApplicationController.getInstance().getAppPrefs().putObject(USER_DETAIL,userDetail);
                 ApplicationController.getInstance().getAppPrefs().commit();
+                Intent i = new Intent(getActivity(), ConfirmBookingActivity.class);
+                startActivity(i);
 
             }
         });

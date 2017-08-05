@@ -151,7 +151,11 @@ public class ServiceFragments extends Fragment {
 
     private void initClassRefrence() {
         TextView price = ((DetailActivity)getActivity()).getPriceView();
-        serviceListAdapter = new ServiceListAdapter(R.layout.service_row, services, mParam2,price,getContext());
+        ArrayList<Service>serviceArrayList = new ArrayList<>();
+        Service service = new Service();
+        serviceArrayList.add(service);
+        serviceArrayList.addAll(services);
+        serviceListAdapter = new ServiceListAdapter(R.layout.service_row, serviceArrayList, mParam2,price,getContext());
         LinearLayoutManager li1 = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL,false)
         {
             @Override

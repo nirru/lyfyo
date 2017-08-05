@@ -3,6 +3,7 @@ package oxilo.com.lyfyo.ui.adapter;
 import android.content.Context;
 import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,16 +16,21 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.squareup.picasso.Picasso;
 
 import java.text.DecimalFormat;
 import java.util.List;
 
+import oxilo.com.lyfyo.ApplicationController;
 import oxilo.com.lyfyo.R;
 import oxilo.com.lyfyo.ui.activity.DetailActivity;
 import oxilo.com.lyfyo.ui.modal.FilterDatum;
 import oxilo.com.lyfyo.ui.modal.Package;
 import oxilo.com.lyfyo.ui.modal.Service;
+import oxilo.com.lyfyo.ui.modal.UserDetail;
+
+import static oxilo.com.lyfyo.AppConstant.USER_DETAIL;
 
 
 /**
@@ -39,12 +45,14 @@ public class PackageListAdapter<T> extends RecyclerView.Adapter<RecyclerView.Vie
     private int inflated_row;
     public static boolean isLoading;
     TextView price;
+    StringBuilder stringBuilder;
 
     public PackageListAdapter(int inflated_row, List<T> productLists, TextView price,Context mContext) {
         this.mContext = mContext;
         this.dataSet = productLists;
         this.inflated_row = inflated_row;
         this.price = price;
+        stringBuilder = new StringBuilder();
     }
     public void setOnItemClickListener(MyClickListener myClickListener) {
         this.myClickListener = myClickListener;
@@ -173,12 +181,27 @@ public class PackageListAdapter<T> extends RecyclerView.Adapter<RecyclerView.Vie
 
         if(holder instanceof EventViewHolder){
             T dataItem = dataSet.get(position);
-       ((EventViewHolder) holder).offer_services.setText(getServiceString(((Package)dataItem).getService()));
+       ((EventViewHolder) holder).offer_services.setText(Html.fromHtml(((Package)dataItem).getOFDescription()));
        ((EventViewHolder) holder).main_price.setText("Rs " + ((Package)dataItem).getPckcartTotalprice());
        ((EventViewHolder) holder).discount_price.setText("Rs " + ((Package)dataItem).getPckcartValueprice() + "");
 
+            if (((Package)dataItem).getPackageDiscount().equals("0 %")){
+                ((EventViewHolder) holder).percent_discount.setVisibility(View.GONE);
+                ((EventViewHolder) holder).main_price.setVisibility(View.GONE);
+                ((EventViewHolder) holder).offer_services.setVisibility(View.VISIBLE);
+            }else{
+                ((EventViewHolder) holder).percent_discount.setVisibility(View.VISIBLE);
+                ((EventViewHolder) holder).percent_discount.setText(((Package)dataItem).getPackageDiscount());
+                ((EventViewHolder) holder).main_price.setVisibility(View.VISIBLE);
+                ((EventViewHolder) holder).offer_services.setVisibility(View.VISIBLE);
+            }
+
+            if (!((Package)dataItem).is_add_button_clicked()){
+                ((EventViewHolder) holder).add.setText("Add");
+            }else{
+                ((EventViewHolder) holder).add.setText("Remove");
+            }
                 final String image_Url =  ((Package)dataItem).getImages();
-                Log.e("IMAGE==","" + image_Url);
                 if (image_Url!=null && !image_Url.equals("")){
                     Picasso
                             .with(mContext)
@@ -199,11 +222,36 @@ public class PackageListAdapter<T> extends RecyclerView.Adapter<RecyclerView.Vie
             ((EventViewHolder) holder).add.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    EventViewHolder eventViewHolder = (EventViewHolder) v.getTag();
                     T dataItem = dataSet.get((Integer) v.getId());
                     Package aPackage = ((Package)dataItem);//(Service) v.getTag();
+//                    double _price = 0;
+//                    if (eventViewHolder.add.getText().toString().equals("Add")){
+//                        eventViewHolder.add.setText("Remove");
+//                        aPackage.setIs_Detail_Open(true);
+//                        _price = ((DetailActivity)mContext).getTotal() + Double.parseDouble(aPackage.getPckcartValueprice());
+//                    }else if (eventViewHolder.add.getText().toString().equals("Remove")){
+//                        eventViewHolder.add.setText("Add");
+//                        aPackage.setIs_Detail_Open(false);
+//                        _price = ((DetailActivity)mContext).getTotal() - Double.parseDouble(aPackage.getPckcartValueprice());
+//                    }
                     double _price = ((DetailActivity)mContext).getTotal() + Double.parseDouble(aPackage.getPckcartValueprice());
                     ((DetailActivity)mContext).setTotal(_price);
                     price.setText("" + ((DetailActivity)mContext).getTotal());
+
+                    stringBuilder.append(aPackage.getPckcartId() + ",");
+                    UserDetail userDetail = ApplicationController.getInstance().getAppPrefs().getObject(USER_DETAIL, UserDetail.class);
+                    if (userDetail == null) {
+                        userDetail = new UserDetail();
+                        userDetail.setPackage_id(stringBuilder.toString());
+                    }
+                    else{
+                        userDetail.setPackage_id(stringBuilder.toString());
+                    }
+                    ApplicationController.getInstance().getAppPrefs().putObject(USER_DETAIL,userDetail);
+                    ApplicationController.getInstance().getAppPrefs().commit();
+
+
                 }
             });
 
@@ -215,7 +263,8 @@ public class PackageListAdapter<T> extends RecyclerView.Adapter<RecyclerView.Vie
                     Package aPackage = ((Package)dataItem);
                     aPackage.setIs_Detail_Open(true);
                     eventViewHolder.linearLayout_popup.setVisibility(View.VISIBLE);
-                    eventViewHolder.total_services.setText(getServiceString(aPackage.getService()));
+                    eventViewHolder.total_services.setText(Html.fromHtml(aPackage.getOFHighlights()));
+
                 }
             });
 
@@ -268,13 +317,14 @@ public class PackageListAdapter<T> extends RecyclerView.Adapter<RecyclerView.Vie
     // you provide access to all the views for a data item in a view holder
     public static class EventViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         protected ImageView img;
-        protected TextView offer_services,view_Details,main_price,add,discount_price;
+        protected TextView offer_services,view_Details,main_price,add,discount_price,percent_discount;
         ImageView img_clear;
         TextView total_services;
          LinearLayout linearLayout_popup;
         public EventViewHolder(View v) {
             super(v);
             img = (ImageView)v.findViewById(R.id.imageView);
+            percent_discount = (TextView)v.findViewById(R.id.percent_discount);
             offer_services = (TextView)v.findViewById(R.id.service_list) ;
             view_Details = (TextView)v.findViewById(R.id.view_details) ;
             main_price = (TextView)v.findViewById(R.id.main_price);

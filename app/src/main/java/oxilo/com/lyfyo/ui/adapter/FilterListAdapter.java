@@ -176,11 +176,11 @@ public class FilterListAdapter<T> extends RecyclerView.Adapter<RecyclerView.View
        ((EventViewHolder) holder).sl_location.setText(((Result)dataItem).getDistance()+"");
             ((EventViewHolder) holder).sl_votes.setText(((Result)dataItem).getSlVote() + " votes");
         ((EventViewHolder) holder).sl_type.setText(((Result)dataItem).getSlType());
-//            if (((FilterDatum)dataItem).getOffers().size()>0){
-//                ((FilterListAdapter.EventViewHolder) holder).rl_offer.setVisibility(View.VISIBLE);
-//            }else{
-//                ((FilterListAdapter.EventViewHolder) holder).rl_offer.setVisibility(View.GONE);
-//            }
+            if (((Result)dataItem).getIsOffer()==1){
+                ((FilterListAdapter.EventViewHolder) holder).rl_offer.setVisibility(View.VISIBLE);
+            }else{
+                ((FilterListAdapter.EventViewHolder) holder).rl_offer.setVisibility(View.GONE);
+            }
                 final String image_Url =  ((Result)dataItem).getBimgPrimImg();
                 if (image_Url!=null && !image_Url.equals("")){
                     Picasso

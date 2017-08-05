@@ -171,11 +171,11 @@ public class NearBySaloonListAdapter<T> extends RecyclerView.Adapter<RecyclerVie
        ((EventViewHolder) holder).sl_location.setText(((Result)dataItem).getDistance() + "");
             ((EventViewHolder) holder).sl_votes.setText(((Result)dataItem).getSlVote() + " votes");
         ((EventViewHolder) holder).sl_type.setText(((Result)dataItem).getSlType());
-//            if (((Result)dataItem).getOffers().size()>0){
-//                ((NearBySaloonListAdapter.EventViewHolder) holder).rl_offer.setVisibility(View.VISIBLE);
-//            }else{
-//                ((NearBySaloonListAdapter.EventViewHolder) holder).rl_offer.setVisibility(View.GONE);
-//            }
+            if (((Result)dataItem).getIsOffer() == 1){
+                ((NearBySaloonListAdapter.EventViewHolder) holder).rl_offer.setVisibility(View.VISIBLE);
+            }else{
+                ((NearBySaloonListAdapter.EventViewHolder) holder).rl_offer.setVisibility(View.GONE);
+            }
                 final String image_Url =  ((Result)dataItem).getBimgPrimImg();
                 if (image_Url!=null && !image_Url.equals("")){
                     Picasso

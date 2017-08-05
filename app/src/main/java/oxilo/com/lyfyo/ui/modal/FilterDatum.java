@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
         "sl_close_hour",
         "Id",
         "sl_lat",
+        "BU_servicefor",
         "sl_long",
         "code",
         "businessName",
@@ -40,19 +41,32 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
         "pincode",
         "cost",
         "avgcost",
+        "distance",
+        "sl_type",
         "category",
+        "sl_rating",
+        "sl_vote",
         "package",
-        "images"
+        "images",
+        "is_Offer"
 })
 public class FilterDatum implements Parcelable
 {
 
+    @JsonProperty("sl_open_date")
+    private String slOpenDate;
+    @JsonProperty("sl_close_date")
+    private String slCloseDate;
+    @JsonProperty("sl_open_hour")
+    private String slOpenHour;
+    @JsonProperty("sl_close_hour")
+    private String slCloseHour;
     @JsonProperty("Id")
     private String id;
-    @JsonProperty("BU_servicefor")
-    private String bUServicefor;
     @JsonProperty("sl_lat")
     private String slLat;
+    @JsonProperty("BU_servicefor")
+    private String bUServicefor;
     @JsonProperty("sl_long")
     private String slLong;
     @JsonProperty("code")
@@ -71,6 +85,10 @@ public class FilterDatum implements Parcelable
     private String mobile;
     @JsonProperty("tag")
     private String tag;
+    @JsonProperty("description")
+    private String description;
+    @JsonProperty("shortdesc")
+    private String shortdesc;
     @JsonProperty("houseno")
     private String houseno;
     @JsonProperty("address1")
@@ -85,29 +103,24 @@ public class FilterDatum implements Parcelable
     private String pincode;
     @JsonProperty("cost")
     private String cost;
-    @JsonProperty("description")
-    private String description;
-    @JsonProperty("shortdesc")
-    private String shortdesc;
     @JsonProperty("avgcost")
-    private String avgcost;
+    private Object avgcost;
     @JsonProperty("distance")
     private String distance;
     @JsonProperty("sl_type")
     private String slType;
-    @JsonProperty("sl_rating")
-    private String slRating;
-    @JsonProperty("sl_vote")
-    private Integer slVote;
     @JsonProperty("category")
     private List<Category> category = new ArrayList<>();
+    @JsonProperty("sl_rating")
+    private Double slRating;
+    @JsonProperty("sl_vote")
+    private String slVote;
     @JsonProperty("package")
     private List<Package> _package = new ArrayList<>();
     @JsonProperty("images")
     private List<Image> images = new ArrayList<>();
-    @JsonProperty("offers")
-    private List<Offer> offers = new ArrayList<>();
-
+    @JsonProperty("is_Offer")
+    private Integer isOffer;
     public final static Parcelable.Creator<FilterDatum> CREATOR = new Creator<FilterDatum>() {
 
 
@@ -116,9 +129,13 @@ public class FilterDatum implements Parcelable
         })
         public FilterDatum createFromParcel(Parcel in) {
             FilterDatum instance = new FilterDatum();
+            instance.slOpenDate = ((String) in.readValue((String.class.getClassLoader())));
+            instance.slCloseDate = ((String) in.readValue((String.class.getClassLoader())));
+            instance.slOpenHour = ((String) in.readValue((String.class.getClassLoader())));
+            instance.slCloseHour = ((String) in.readValue((String.class.getClassLoader())));
             instance.id = ((String) in.readValue((String.class.getClassLoader())));
-            instance.bUServicefor = ((String) in.readValue((String.class.getClassLoader())));
             instance.slLat = ((String) in.readValue((String.class.getClassLoader())));
+            instance.bUServicefor = ((String) in.readValue((String.class.getClassLoader())));
             instance.slLong = ((String) in.readValue((String.class.getClassLoader())));
             instance.code = ((String) in.readValue((String.class.getClassLoader())));
             instance.businessName = ((String) in.readValue((String.class.getClassLoader())));
@@ -128,6 +145,8 @@ public class FilterDatum implements Parcelable
             instance.phone = ((String) in.readValue((String.class.getClassLoader())));
             instance.mobile = ((String) in.readValue((String.class.getClassLoader())));
             instance.tag = ((String) in.readValue((String.class.getClassLoader())));
+            instance.description = ((String) in.readValue((String.class.getClassLoader())));
+            instance.shortdesc = ((String) in.readValue((String.class.getClassLoader())));
             instance.houseno = ((String) in.readValue((String.class.getClassLoader())));
             instance.address1 = ((String) in.readValue((String.class.getClassLoader())));
             instance.address2 = ((String) in.readValue((String.class.getClassLoader())));
@@ -135,17 +154,15 @@ public class FilterDatum implements Parcelable
             instance.landmark = ((String) in.readValue((String.class.getClassLoader())));
             instance.pincode = ((String) in.readValue((String.class.getClassLoader())));
             instance.cost = ((String) in.readValue((String.class.getClassLoader())));
-            instance.description = ((String) in.readValue((String.class.getClassLoader())));
-            instance.shortdesc = ((String) in.readValue((String.class.getClassLoader())));
-            instance.avgcost = ((String) in.readValue((String.class.getClassLoader())));
+            instance.avgcost = ((Object) in.readValue((Object.class.getClassLoader())));
             instance.distance = ((String) in.readValue((String.class.getClassLoader())));
             instance.slType = ((String) in.readValue((String.class.getClassLoader())));
-            instance.slRating = ((String) in.readValue((String.class.getClassLoader())));
-            instance.slVote = ((Integer) in.readValue((Integer.class.getClassLoader())));
             in.readList(instance.category, (Category.class.getClassLoader()));
+            instance.slRating = ((Double) in.readValue((Double.class.getClassLoader())));
+            instance.slVote = ((String) in.readValue((String.class.getClassLoader())));
             in.readList(instance._package, (Package.class.getClassLoader()));
             in.readList(instance.images, (Image.class.getClassLoader()));
-            in.readList(instance.offers, (Offer.class.getClassLoader()));
+            instance.isOffer = ((Integer) in.readValue((Integer.class.getClassLoader())));
             return instance;
         }
 
@@ -153,8 +170,47 @@ public class FilterDatum implements Parcelable
             return (new FilterDatum[size]);
         }
 
+    };
+
+    @JsonProperty("sl_open_date")
+    public String getSlOpenDate() {
+        return slOpenDate;
     }
-            ;
+
+    @JsonProperty("sl_open_date")
+    public void setSlOpenDate(String slOpenDate) {
+        this.slOpenDate = slOpenDate;
+    }
+
+    @JsonProperty("sl_close_date")
+    public String getSlCloseDate() {
+        return slCloseDate;
+    }
+
+    @JsonProperty("sl_close_date")
+    public void setSlCloseDate(String slCloseDate) {
+        this.slCloseDate = slCloseDate;
+    }
+
+    @JsonProperty("sl_open_hour")
+    public String getSlOpenHour() {
+        return slOpenHour;
+    }
+
+    @JsonProperty("sl_open_hour")
+    public void setSlOpenHour(String slOpenHour) {
+        this.slOpenHour = slOpenHour;
+    }
+
+    @JsonProperty("sl_close_hour")
+    public String getSlCloseHour() {
+        return slCloseHour;
+    }
+
+    @JsonProperty("sl_close_hour")
+    public void setSlCloseHour(String slCloseHour) {
+        this.slCloseHour = slCloseHour;
+    }
 
     @JsonProperty("Id")
     public String getId() {
@@ -166,16 +222,6 @@ public class FilterDatum implements Parcelable
         this.id = id;
     }
 
-    @JsonProperty("BU_servicefor")
-    public String getBUServicefor() {
-        return bUServicefor;
-    }
-
-    @JsonProperty("BU_servicefor")
-    public void setBUServicefor(String bUServicefor) {
-        this.bUServicefor = bUServicefor;
-    }
-
     @JsonProperty("sl_lat")
     public String getSlLat() {
         return slLat;
@@ -184,6 +230,16 @@ public class FilterDatum implements Parcelable
     @JsonProperty("sl_lat")
     public void setSlLat(String slLat) {
         this.slLat = slLat;
+    }
+
+    @JsonProperty("BU_servicefor")
+    public String getBUServicefor() {
+        return bUServicefor;
+    }
+
+    @JsonProperty("BU_servicefor")
+    public void setBUServicefor(String bUServicefor) {
+        this.bUServicefor = bUServicefor;
     }
 
     @JsonProperty("sl_long")
@@ -276,6 +332,26 @@ public class FilterDatum implements Parcelable
         this.tag = tag;
     }
 
+    @JsonProperty("description")
+    public String getDescription() {
+        return description;
+    }
+
+    @JsonProperty("description")
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    @JsonProperty("shortdesc")
+    public String getShortdesc() {
+        return shortdesc;
+    }
+
+    @JsonProperty("shortdesc")
+    public void setShortdesc(String shortdesc) {
+        this.shortdesc = shortdesc;
+    }
+
     @JsonProperty("houseno")
     public String getHouseno() {
         return houseno;
@@ -346,33 +422,13 @@ public class FilterDatum implements Parcelable
         this.cost = cost;
     }
 
-    @JsonProperty("description")
-    public String getDescription() {
-        return description;
-    }
-
-    @JsonProperty("description")
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    @JsonProperty("shortdesc")
-    public String getShortdesc() {
-        return shortdesc;
-    }
-
-    @JsonProperty("shortdesc")
-    public void setShortdesc(String shortdesc) {
-        this.shortdesc = shortdesc;
-    }
-
     @JsonProperty("avgcost")
-    public String getAvgcost() {
+    public Object getAvgcost() {
         return avgcost;
     }
 
     @JsonProperty("avgcost")
-    public void setAvgcost(String avgcost) {
+    public void setAvgcost(Object avgcost) {
         this.avgcost = avgcost;
     }
 
@@ -396,27 +452,6 @@ public class FilterDatum implements Parcelable
         this.slType = slType;
     }
 
-    @JsonProperty("sl_rating")
-    public String getSlRating() {
-        return slRating;
-    }
-
-    @JsonProperty("sl_rating")
-    public void setSlRating(String slRating) {
-        this.slRating = slRating;
-    }
-
-    @JsonProperty("sl_vote")
-    public Integer getSlVote() {
-        return slVote;
-    }
-
-    @JsonProperty("sl_vote")
-    public void setSlVote(Integer slVote) {
-        this.slVote = slVote;
-    }
-
-
     @JsonProperty("category")
     public List<Category> getCategory() {
         return category;
@@ -425,6 +460,26 @@ public class FilterDatum implements Parcelable
     @JsonProperty("category")
     public void setCategory(List<Category> category) {
         this.category = category;
+    }
+
+    @JsonProperty("sl_rating")
+    public Double getSlRating() {
+        return slRating;
+    }
+
+    @JsonProperty("sl_rating")
+    public void setSlRating(Double slRating) {
+        this.slRating = slRating;
+    }
+
+    @JsonProperty("sl_vote")
+    public String getSlVote() {
+        return slVote;
+    }
+
+    @JsonProperty("sl_vote")
+    public void setSlVote(String slVote) {
+        this.slVote = slVote;
     }
 
     @JsonProperty("package")
@@ -447,20 +502,24 @@ public class FilterDatum implements Parcelable
         this.images = images;
     }
 
-    @JsonProperty("offers")
-    public List<Offer> getOffers() {
-        return offers;
+    @JsonProperty("is_Offer")
+    public Integer getIsOffer() {
+        return isOffer;
     }
 
-    @JsonProperty("offers")
-    public void setOffers(List<Offer> offers) {
-        this.offers = offers;
+    @JsonProperty("is_Offer")
+    public void setIsOffer(Integer isOffer) {
+        this.isOffer = isOffer;
     }
 
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeValue(slOpenDate);
+        dest.writeValue(slCloseDate);
+        dest.writeValue(slOpenHour);
+        dest.writeValue(slCloseHour);
         dest.writeValue(id);
-        dest.writeValue(bUServicefor);
         dest.writeValue(slLat);
+        dest.writeValue(bUServicefor);
         dest.writeValue(slLong);
         dest.writeValue(code);
         dest.writeValue(businessName);
@@ -470,6 +529,8 @@ public class FilterDatum implements Parcelable
         dest.writeValue(phone);
         dest.writeValue(mobile);
         dest.writeValue(tag);
+        dest.writeValue(description);
+        dest.writeValue(shortdesc);
         dest.writeValue(houseno);
         dest.writeValue(address1);
         dest.writeValue(address2);
@@ -477,17 +538,15 @@ public class FilterDatum implements Parcelable
         dest.writeValue(landmark);
         dest.writeValue(pincode);
         dest.writeValue(cost);
-        dest.writeValue(description);
-        dest.writeValue(shortdesc);
         dest.writeValue(avgcost);
         dest.writeValue(distance);
         dest.writeValue(slType);
+        dest.writeList(category);
         dest.writeValue(slRating);
         dest.writeValue(slVote);
-        dest.writeList(category);
         dest.writeList(_package);
         dest.writeList(images);
-        dest.writeList(offers);
+        dest.writeValue(isOffer);
     }
 
     public int describeContents() {

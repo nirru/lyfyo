@@ -97,4 +97,21 @@ public interface WebService {
             @Field("fname") String fname,
             @Field("lname") String lname,
             @Field("email") String email);
+
+    @FormUrlEncoded
+    @POST("index.php/APII/SalonList")
+    io.reactivex.Observable<Response<ResponseBody>> getDetailById(
+            @Field("salonId") String id);
+
+    @FormUrlEncoded
+    @POST("index.php/APII/SalonList")
+    io.reactivex.Observable<Response<ResponseBody>> bookAppointment(
+            @Field("salonId") String salonId,
+            @Field("userId") String userId,
+            @Field("date") String date,
+            @Field("startTime") String startTime,
+            @Field("endTime") String endTime,
+            @Field("note") String note,
+            @Field("status") String status,
+            @Field("status") String packageId);
 }

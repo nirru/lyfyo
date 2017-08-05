@@ -160,7 +160,7 @@ public class ProfileSetUpActivity extends AppCompatActivity {
                                     ObjectMapper mapper = new ObjectMapper();
                                     mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
                                     UserDetail userDetail = mapper.readValue(mapping.getString("userDetail"), new TypeReference<UserDetail>() {});
-
+                                    userDetail.setLoggedIn(true);
                                     ApplicationController.getInstance().getAppPrefs().putObject(USER_DETAIL,userDetail);
                                     ApplicationController.getInstance().getAppPrefs().commit();
                                     Intent i = new Intent(ProfileSetUpActivity.this,CalenderActivity.class);

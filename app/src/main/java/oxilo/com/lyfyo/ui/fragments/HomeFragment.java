@@ -318,9 +318,9 @@ public class HomeFragment extends Fragment implements FilterFragment.Filter, Loc
         horizentalVerticalListAdapter.setOnItemClickListener(new HorizentalVerticalListAdapter.MyClickListener() {
             @Override
             public void onItemClick(int position, View v) {
-                FilterDatum filterDatum = (FilterDatum) horizentalVerticalListAdapter.dataSet.get(position);
+                Result result = (Result) horizentalVerticalListAdapter.dataSet.get(position);
                 Intent i = new Intent(getActivity(), DetailActivity.class);
-                i.putExtra("list", filterDatum);
+                i.putExtra("ID", result.getId());
                 startActivity(i);
             }
         });
@@ -600,9 +600,9 @@ public class HomeFragment extends Fragment implements FilterFragment.Filter, Loc
         filterListAdapter.setOnItemClickListener(new FilterListAdapter.MyClickListener() {
             @Override
             public void onItemClick(int position, View v) {
-                FilterDatum filterDatum = (FilterDatum) filterListAdapter.dataSet.get(position);
+                Result result = (Result) filterListAdapter.dataSet.get(position);
                 Intent i = new Intent(getActivity(), DetailActivity.class);
-                i.putExtra("list", filterDatum);
+                i.putExtra("ID", result.getId());
                 startActivity(i);
             }
         });

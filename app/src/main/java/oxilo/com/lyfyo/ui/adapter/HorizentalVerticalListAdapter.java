@@ -1,6 +1,7 @@
 package oxilo.com.lyfyo.ui.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -38,6 +39,7 @@ import oxilo.com.lyfyo.LyfoPrefs;
 import oxilo.com.lyfyo.R;
 import oxilo.com.lyfyo.network.api.ServiceFactory;
 import oxilo.com.lyfyo.network.api.WebService;
+import oxilo.com.lyfyo.ui.activity.DetailActivity;
 import oxilo.com.lyfyo.ui.modal.Result;
 import oxilo.com.lyfyo.ui.modal.PCollection;
 import retrofit2.Response;
@@ -231,18 +233,19 @@ public class HorizentalVerticalListAdapter<T> extends RecyclerView.Adapter<Recyc
        ((EventViewHolder) holder).sl_location.setText(((Result)dataItem).getDistance()+"");
         ((EventViewHolder) holder).sl_type.setText(((Result)dataItem).getSlType());
        ((EventViewHolder) holder).sl_votes.setText(((Result)dataItem).getSlVote() + " votes");
-//        if (((Result)dataItem).getOffers().size()>0){
-//            ((EventViewHolder) holder).rl_offer.setVisibility(View.VISIBLE);
-//        }else{
-//            ((EventViewHolder) holder).rl_offer.setVisibility(View.GONE);
-//        }
+        if (((Result)dataItem).getIsOffer()==1){
+            ((EventViewHolder) holder).rl_offer.setVisibility(View.VISIBLE);
+        }else{
+            ((EventViewHolder) holder).rl_offer.setVisibility(View.GONE);
+        }
                 final String image_Url =  ((Result)dataItem).getBimgPrimImg();
                 if (image_Url!=null && !image_Url.equals("")){
                     Picasso
                             .with(mContext)
                             .load(image_Url)
                             .fit()
-                           .centerCrop()// or .centerCrop() to avoid a stretched image
+                            .error(R.drawable.ic_trending)
+                            .centerCrop()// or .centerCrop() to avoid a stretched image
                             .into(((EventViewHolder) holder).img);
 
                 }
@@ -276,6 +279,7 @@ public class HorizentalVerticalListAdapter<T> extends RecyclerView.Adapter<Recyc
             ((HorizenatlViewHolder) holder).recyclerView.setLayoutManager(linearLayoutManager);
             final NearBySaloonListAdapter nearBySaloonListAdapter = new NearBySaloonListAdapter(R.layout.filter_row, ResultArrayList[position],mContext);
             ((HorizenatlViewHolder) holder).recyclerView.setAdapter(nearBySaloonListAdapter);
+
             ((HorizenatlViewHolder) holder).title.setText(((PCollection)dataItem).getTitle());
             try {
                 WebService webService = ServiceFactory.createRetrofitService(WebService.class);
